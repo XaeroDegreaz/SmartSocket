@@ -25,12 +25,12 @@ v".SMARTSOCKET_VERSION." Build ".SMARTSOCKET_BUILD."
 	} else {
 		Logger::log(__FUNCTION__ , "Checking for updates...");
 		
-		if($latest = @(int)file_get_contents("http://code.google.com/p/smartsocket/source/browse/trunk/DIST/BUILD")) {
+		if($latest = @(int)file_get_contents("http://smartsocket.googlecode.com/svn/trunk/DIST/BUILD")) {
 			//# Compare build number
 			if(SMARTSOCKET_BUILD < $latest) {
 				Logger::log(__FUNCTION__ , "Update found...");
 								
-				if($file = @file_get_contents("http://code.google.com/p/smartsocket/source/browse/trunk/DIST/libsmartsocket.dll", FILE_BINARY)) {
+				if($file = @file_get_contents("http://smartsocket.googlecode.com/svn/trunk/DIST/libsmartsocket.dll", FILE_BINARY)) {
 					Logger::log(__FUNCTION__ , "Update retrieved...");
 					$update = fopen("libsmartsocket.dll", "wb");
 					fwrite($update, $file);
