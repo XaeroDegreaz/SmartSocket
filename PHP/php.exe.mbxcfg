@@ -1,0 +1,10 @@
+
+box.encrypt=1
+box.separate=0
+box.ziplevel=1
+exe.crc=0
+exe.pack=1
+exe.packedfilesvisible=1
+exe.source=H:\SmartSocket\trunk\PHP\php.exe
+exe.target=SmartSocket.exe
+

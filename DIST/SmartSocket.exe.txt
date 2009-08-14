@@ -1,0 +1,49 @@
+target executable H:\SmartSocket\trunk\DIST\SmartSocket.exe
+
+Relink 4 sections of executable
+SECTION  0(   .text):
++  compressed 12288 -> 4935 bytes
++  encrypting 8192 bytes
++  adding 8192 bytes
+SECTION  1(  .rdata):
++  compressed 8192 -> 3041 bytes
++  encrypting 4096 bytes
++  adding 4096 bytes
+SECTION  2(   .data):
++  encrypting 4096 bytes
++  adding 4096 bytes
+SECTION  3(   .rsrc):
++  adding 4096 bytes
+
+integrating starter
+SECTION  4: 118784 bytes
+starter compressed to 69632 bytes
+Target executable size has been set to 94208 bytes (286% of 32890)
+
+PACKING DEFAULT PACKAGE
+using ZIP compression
+setting compression threshold to 95%
+using strong encryption
++   0B 'Bin\BLANK'
++  17K(28.5%) 'Bin\php_ext\php_bcompiler.dll'
++  27K(40.7%) 'Bin\php_ext\php_bz2.dll'
++  14K(32.1%) 'Bin\php_ext\php_mysql.dll'
++  14K(29.9%) 'Bin\php_ext\php_sockets.dll'
++ 114B(91.2%) 'Bin\Start.php'
++ 857K(42.3%) 'libmysql.dll'
++  16K(33.9%) 'php.ini'
++2322K(48.4%) 'php5ts.dll'
+catalog: 312 bytes
+total: 7096K in 9 files
+
+STATISTICS
+
+size of program     -      24576 bytes
+size of bootstub    -      69632 bytes
+size of box         -    3348896 bytes (46.1% of original)
+        total size  -    3443104 bytes
+
+exe packing         -          enabled
+exe CRC check       -         disabled
+bootstub            -          release
+SUCCESS

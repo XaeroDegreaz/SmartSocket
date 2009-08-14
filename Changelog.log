@@ -1,0 +1,8 @@
+SmartSocket - Extensible PHP Socket Server
+
+02.JUN.09
+-Added some tabbed formatting to the Logger class.
+-Added the ability to force Zlib compression for sending and receiving data. It can now be set to true or false via the SmartSocket Config.xml
+-Fixed a few errors with the Example.php and also reflected the changes in the project _STUB class file.
+
+V0.0.0 - First Distributed Build

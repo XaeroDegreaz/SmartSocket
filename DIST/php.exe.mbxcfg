@@ -1,0 +1,29 @@
+
+box.cmdline=
+box.encrypt=1
+box.packdefault=1
+box.pattern=*.*
+box.separate=0
+box.sepfile=
+box.ziplevel=1
+box.zipthold=95
+dir.addfiles=H:\SmartSocket\trunk\DIST\Bin
+exe.crc=0
+exe.pack=1
+exe.packedfilesvisible=1
+exe.source=H:\SmartSocket\trunk\DIST\php.exe
+exe.target=SmartSocket.exe
+key.0=316D1BEABACCA4C1A60499A77C4F22AB
+key.1=E3D2C8725F18326199376E3BA81C6187
+
+box.contents~
+00 libmysql.dll
+00 php.ini
+00 php5ts.dll
+00 Bin\BLANK
+00 Bin\Start.php
+00 Bin\php_ext\php_bcompiler.dll
+00 Bin\php_ext\php_bz2.dll
+00 Bin\php_ext\php_mysql.dll
+00 Bin\php_ext\php_sockets.dll
+~

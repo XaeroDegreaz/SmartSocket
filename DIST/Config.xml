@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<ip>localhost</ip>
+	<port>8888</port>
+	<default_extension>Example</default_extension>
+	<useZlib>false</useZlib>
+	<auto_update>true</auto_update>
+	<allow_remote_console>true</allow_remote_console>
+</Config>
