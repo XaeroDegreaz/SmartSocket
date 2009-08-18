@@ -21,7 +21,7 @@ final class ExtensionManager {
 	 * @param $defaultExtension string "This is determined by the defaultExtension node in Config.xml"
 	 * @return unknown_type
 	 */
-	public function Start($defaultExtension) {
+	public function Start() {
 		Logger::log(__CLASS__, "Listing valid extensions...");
 		
 		if ($handle = opendir('./Extensions')) {
@@ -29,7 +29,7 @@ final class ExtensionManager {
 			echo("*********************************************\n");
 			$i = 1;
 			$list = array();
-			$list[] = $defaultExtension;
+			$list[] = DEFAULT_EXTENSION;
 			while (false !== ($file = readdir($handle))) {
 
 				if ($file != "." && $file != ".." && is_dir("./Extensions/$file")) {
@@ -51,7 +51,7 @@ final class ExtensionManager {
 		$out = fopen("php://stdout", "w");
 		$in = fopen("php://stdin", "r");
 
-		fwrite($out, "Which project should I launch? [blank = $defaultExtension]: ");
+		fwrite($out, "Which project should I launch? [blank = ".DEFAULT_EXTENSION."]: ");
 		$ProjectName = trim(fgets($in));
 		echo("*=*=*=*=*=*=*=*=*=*=START*=*=*=*=*=*=*=*=*=*=\n\n");
 		

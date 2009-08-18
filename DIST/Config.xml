@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<ip>localhost</ip>
-	<port>8888</port>
-	<default_extension>Example</default_extension>
-	<useZlib>false</useZlib>
-	<auto_update>true</auto_update>
-	<allow_remote_console>true</allow_remote_console>
+	<constants>
+		<SMARTSOCKET_HOST type="string">localhost</SMARTSOCKET_HOST>
+		<SMARTSOCKET_PORT type="int">8888</SMARTSOCKET_PORT>
+		<DEFAULT_EXTENSION type="string">Example</DEFAULT_EXTENSION>
+		<SMARTSOCKET_USEZLIB type="string">false</SMARTSOCKET_USEZLIB>
+		<SMARTSOCKET_AUTOUPDATE type="string">true</SMARTSOCKET_AUTOUPDATE>
+		<!-- 
+		We need a delimiter because sometimes the server may squeeze 2 messages into 1 send for a socket
+		especially if you are running the server and the client on the same machine. For this, we need a
+		way to separate each individual write to the client.
+		-->
+		<SMARTSOCKET_XML_DELIMITER type="string"><![CDATA[<!dlmtr/>]]></SMARTSOCKET_XML_DELIMITER>
+	</constants>
+	
+	<allow_remote_console>true</allow_remote_console>	
+	<xml_protocol enabled="true" />
 </Config>

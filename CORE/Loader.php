@@ -23,11 +23,10 @@ final class Loader {
 		$file = "Config.xml";
 		if($this->xml = simplexml_load_file($file)) {
 			
-			$this->ip = (string)$this->xml->ip;
-			Logger::log(__CLASS__, "Server IP: $this->ip.");
-		
-			$this->port = (integer)$this->xml->port;
-			Logger::log(__CLASS__, "Server Port: $this->port.");
+			foreach($this->xml->constants->children() as $constant) {
+				echo($constant);
+				define($constant->getName(), $constant);
+			}
 			
 		}else {
 			Logger::log(__CLASS__, "Could not load the configuration file ($file).", true);

@@ -1,6 +1,7 @@
 <?php
 
-function Start() {  
+function Start() {
+	$smartsocket_config = new Loader(); 
 	echo("
 *********************************************
 *                                           *
@@ -12,15 +13,11 @@ function Start() {
 *********************************************
 v".SMARTSOCKET_VERSION." Build ".SMARTSOCKET_BUILD."
 \n\n");
-
-
-	$xml = simplexml_load_file("Config.xml");
-	
 	
 	//# We check for auto updates here.
-	if((string)$xml->auto_update == "false") {
+	if(SMARTSOCKET_AUTOUPDATE == "false") {
 		
-		Logger::log(__FUNCTION__ , "Skipping update check. ".(string)$xml["auto_update"]);
+		Logger::log(__FUNCTION__ , "Skipping update check. Change SMARTSOCKET_AUTOUPDATE to true on Config.xml");
 		
 	} else {
 		Logger::log(__FUNCTION__ , "Checking for updates...");
@@ -57,9 +54,7 @@ v".SMARTSOCKET_VERSION." Build ".SMARTSOCKET_BUILD."
 	//# If update not needed, we will continue.
 	echo("\n");
 	$em = new ExtensionManager();
-	
-	$extension = null;
-	$em->Start((string)$xml->default_extension, $extension);
+	$em->Start();
 
 }
 

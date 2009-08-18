@@ -22,7 +22,7 @@ final class Server {
 		Logger::log(__CLASS__, "Server class initialized.");
 		$this->extension = $extension;
 		
-		$this->Loader = new Loader($this);
+		//$this->Loader = new Loader($this);
 		$this->Handler = new Handler($this);
 				
 	}
@@ -34,7 +34,9 @@ final class Server {
 	 */
 	public function Start($protocol='tcp') {
 				
-		$socket = stream_socket_server("$protocol://".$this->Loader->ip.":".$this->Loader->port, $errno, $errstr);
+		$socket = stream_socket_server("$protocol://".SMARTSOCKET_HOST.":".SMARTSOCKET_PORT, $errno, $errstr);
+		Logger::log(__CLASS__, "Server address: ".SMARTSOCKET_HOST);
+		Logger::log(__CLASS__, "Server port: ".SMARTSOCKET_PORT);
 		
 		if (!$socket) {
 			die("$errstr ($errno)\n");
@@ -92,7 +94,7 @@ final class Server {
 	public function Send($client_list, $data) {
 		
 		//# If the main configuration file is set to use zlib compression, we do it here.
-		if((string)$this->Loader->xml->useZlib == "true") {
+		if(SMARTSOCKET_USEZLIB == "true") {
 			$data = gzcompress($data);
 		}
 		
@@ -100,15 +102,15 @@ final class Server {
 		if(is_array($client_list)) {
 			foreach($client_list as $client) {
 				Logger::log(__CLASS__, "Sending ($data) to ($client_list)");
-				fwrite($client, $data) or
-				Logger::log(__CLASS__, "There was an error sending ($data) to ($client_list)");
+				stream_socket_sendto($client, $data.SMARTSOCKET_XML_DELIMITER) or
+				Logger::log(__CLASS__, "There was an error sending ($data) to ($client)");
 			}
 			
 		}else {
 			//# We are sending to only one client.
 			Logger::log(__CLASS__, "Sending ($data) to ($client_list)");
-			fwrite($client_list, $data) or
-			Logger::log(__CLASS__, "There was an error sending ($data) to ($client_list)");
+			stream_socket_sendto($client_list, $data.SMARTSOCKET_XML_DELIMITER) or
+			Logger::log(__CLASS__, "There was an error sending ($data) to ($client)");
 		}
 		return true;
 		
