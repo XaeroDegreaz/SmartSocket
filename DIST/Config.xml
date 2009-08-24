@@ -6,6 +6,14 @@
 		<DEFAULT_EXTENSION type="string">Example</DEFAULT_EXTENSION>
 		<SMARTSOCKET_USEZLIB type="string">false</SMARTSOCKET_USEZLIB>
 		<SMARTSOCKET_AUTOUPDATE type="string">true</SMARTSOCKET_AUTOUPDATE>
+		
+		<!-- 
+		This determines the send function used to send data to the client.
+		Choices are fwrite and stream_socket_sendto
+		If you don't know the difference, don't worry about it :)
+		 -->
+		<SMARTSOCKET_SEND_FUNCTION type="string">stream_socket_sendto</SMARTSOCKET_SEND_FUNCTION>
+		
 		<!-- 
 		We need a delimiter because sometimes the server may squeeze 2 messages into 1 send for a socket
 		especially if you are running the server and the client on the same machine. For this, we need a

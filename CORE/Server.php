@@ -92,6 +92,7 @@ final class Server {
 	 * @return boolean
 	 */
 	public function Send($client_list, $data) {
+		$sendFunction = SMARTSOCKET_SEND_FUNCTION;
 		
 		//# If the main configuration file is set to use zlib compression, we do it here.
 		if(SMARTSOCKET_USEZLIB == "true") {
@@ -101,16 +102,16 @@ final class Server {
 		//# Goes through the array one by one and sends them each the packet
 		if(is_array($client_list)) {
 			foreach($client_list as $client) {
-				Logger::log(__CLASS__, "Sending ($data) to ($client_list)");
-				stream_socket_sendto($client, $data.SMARTSOCKET_XML_DELIMITER) or
+				Logger::log(__CLASS__, "Sending ($data) to ($client)");
+				$sendFunction($client, $data.SMARTSOCKET_XML_DELIMITER) or
 				Logger::log(__CLASS__, "There was an error sending ($data) to ($client)");
 			}
 			
 		}else {
 			//# We are sending to only one client.
 			Logger::log(__CLASS__, "Sending ($data) to ($client_list)");
-			stream_socket_sendto($client_list, $data.SMARTSOCKET_XML_DELIMITER) or
-			Logger::log(__CLASS__, "There was an error sending ($data) to ($client)");
+			$sendFunction($client_list, $data.SMARTSOCKET_XML_DELIMITER) or
+			Logger::log(__CLASS__, "There was an error sending ($data) to ($client_list)");
 		}
 		return true;
 		
