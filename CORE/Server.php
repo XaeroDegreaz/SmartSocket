@@ -91,8 +91,14 @@ final class Server {
 	 * @param $data string "The data packet to be sent to the client.";
 	 * @return boolean
 	 */
-	public function Send($client_list, $data) {
+	public function Send($client_list, $data, $useDelimiter=true) {
 		$sendFunction = SMARTSOCKET_SEND_FUNCTION;
+		
+		if($useDelimiter) {
+			$delimiter = SMARTSOCKET_XML_DELIMITER;
+		}else {
+			$delimiter = "";
+		}
 		
 		//# If the main configuration file is set to use zlib compression, we do it here.
 		if(SMARTSOCKET_USEZLIB == "true") {
@@ -103,14 +109,14 @@ final class Server {
 		if(is_array($client_list)) {
 			foreach($client_list as $client) {
 				Logger::log(__CLASS__, "Sending ($data) to ($client)");
-				$sendFunction($client, $data.SMARTSOCKET_XML_DELIMITER) or
+				$sendFunction($client, $data.$delimiter) or
 				Logger::log(__CLASS__, "There was an error sending ($data) to ($client)");
 			}
 			
 		}else {
 			//# We are sending to only one client.
 			Logger::log(__CLASS__, "Sending ($data) to ($client_list)");
-			$sendFunction($client_list, $data.SMARTSOCKET_XML_DELIMITER) or
+			$sendFunction($client_list, $data.$delimiter) or
 			Logger::log(__CLASS__, "There was an error sending ($data) to ($client_list)");
 		}
 		return true;

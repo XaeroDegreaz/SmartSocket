@@ -34,6 +34,15 @@ final class Handler {
 	 */
 	public function onReceive(&$socket, $raw_data, &$master) {
 		
+		//# Send a cross domain policy file if requested.
+		//# May add this to an external config file.
+		if($raw_data == "<policy-file-request/>") {
+			Logger::log(__CLASS__, "Cross-Domain-Policy file requested.");
+			$policy = "<cross-domain-policy><allow-access-from domain='*' to-ports='*' /></cross-domain-policy>";
+			$this->s->Send($socket, $policy, false);
+			return true;
+		}
+		
 		//# Let's check if the useZlib node of the Config.xml is set to true
 		if((string)$this->s->Loader->xml->useZlib == "true") {
 			//# We are supposed to use zlib here, so let's check if the data is zlib or not.
