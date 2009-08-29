@@ -13,6 +13,7 @@ final class ExtensionManager {
 	 */
 	public function ExtensionManager() {
 		Logger::log(__CLASS__, "ExtensionManager loaded.");
+		$this->Start();
 	}
 	
 	/**
@@ -61,6 +62,7 @@ final class ExtensionManager {
 			$this->CreateExtension();
 		}
 		
+		//# Launch the extension chosen from the list. The actual starting of the server begins within your extension.
 		$extension = new $list[(int)$ProjectName]();
 
 	}

@@ -43,9 +43,11 @@ bcompiler_write_class($core, "Server");
 //# Write ETC classes to exe
 bcompiler_write_class($core, "Logger");
 bcompiler_write_class($core, "ExtensionManager");
+//bcompiler_write_function($core, "UpdateManager"); //Why doesn't this work?
 
 
 bcompiler_write_function($core, "__autoload");
+bcompiler_write_file($core, "./CORE/ETC/UpdateManager/UpdateManager.php");
 bcompiler_write_file($core, "./CORE/ETC/misc.php");
 
 bcompiler_write_footer($core);
