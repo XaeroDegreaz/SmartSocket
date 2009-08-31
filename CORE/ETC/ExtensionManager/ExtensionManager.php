@@ -138,7 +138,7 @@ Class $Extension implements Template{
 		Logger::log(__CLASS__, "The extension has received a connection.");
 		
 		//# Let's just send them some simple handshake data to test and see if they are able to receive.
-		\$this->s->Send(\$socket, "<handshake status='1' time='".time()."' />");
+		//# \$this->s->Send(\$socket, "<handshake status='1' time='".time()."' />");
 	}
 	
 	public function onReceive(\$socket, \$raw_data) {
