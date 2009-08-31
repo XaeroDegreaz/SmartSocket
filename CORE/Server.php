@@ -109,14 +109,14 @@ final class Server {
 		if(is_array($client_list)) {
 			foreach($client_list as $client) {
 				Logger::log(__CLASS__, "Sending ($data) to ($client)");
-				$sendFunction($client, $data.$delimiter) or
+				$sendFunction($client, $data.$delimiter.chr(0)) or
 				Logger::log(__CLASS__, "There was an error sending ($data) to ($client)");
 			}
 			
 		}else {
 			//# We are sending to only one client.
 			Logger::log(__CLASS__, "Sending ($data) to ($client_list)");
-			$sendFunction($client_list, $data.$delimiter) or
+			$sendFunction($client_list, $data.$delimiter.chr(0)) or
 			Logger::log(__CLASS__, "There was an error sending ($data) to ($client_list)");
 		}
 		return true;

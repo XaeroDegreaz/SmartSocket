@@ -33,6 +33,9 @@ final class Handler {
 	 * @return boolean
 	 */
 	public function onReceive(&$socket, $raw_data, &$master) {
+		//# Thanks to SiLeNCer on SmartSocket.net for the reminder.
+		//# http://smartsocket.net/viewtopic.php?f=18&t=19
+		$raw_data = trim($raw_data);	
 		
 		//# Send a cross domain policy file if requested.
 		//# May add this to an external config file.
