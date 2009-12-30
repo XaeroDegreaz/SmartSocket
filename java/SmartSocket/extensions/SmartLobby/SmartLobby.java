@@ -27,12 +27,15 @@ public class SmartLobby {
      * When the onReceive method is called, it will parse the XML or JSON
      * and will call the corresponding method named after the node/object name.
      *
-     * XML Example:
+     * Simple XML Example:
      * <login username='XaeroDegreaz' password='SmartSocket' />
+     *
+     * Simple JSON Example:
+     * {"c":"login","username":"XaeroDegreaz","password":"SmartSocket"}
      *
      * would call
      *
-     * public void login(String username, String password) { //# Login logic here }
+     * public void login(Socket socket, Object dataObject) { //# Login logic here }
      *
      */
 

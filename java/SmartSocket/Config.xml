@@ -10,12 +10,12 @@
 
 <config>
 	<constants>
-		<SMARTSOCKET_DATA_PROTOCOL><![CDATA[xml]]></SMARTSOCKET_DATA_PROTOCOL>
+		<SMARTSOCKET_DATA_PROTOCOL><![CDATA[json]]></SMARTSOCKET_DATA_PROTOCOL>
 		<SMARTSOCKET_EXTENSION_DIR><![CDATA[./extensions]]></SMARTSOCKET_EXTENSION_DIR>
 	</constants>
 
 	<extensions>
-		<!--<extension enabled="false" name="Example" port="8889" />-->
+		<extension enabled="true" name="Example" port="8889" />-->
 		<extension enabled="true" name="SmartLobby" port="8888" />
 	</extensions>
 </config>
