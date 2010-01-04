@@ -3,10 +3,10 @@
  */
 package net.smartsocket;
 
-import java.lang.reflect.Array;
-import java.util.Set;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
+import org.json.simple.JSONObject;
+
 
 /**
  * The main class of the application.
@@ -49,7 +49,7 @@ public class Main extends SingleFrameApplication {
      */
     public static void main(String[] args) {
 	launch(Main.class, args);
-	while(MainView.consoleLog == null) {
+	while (MainView.consoleLog == null) {
 	    //# Here we are waiting for the console to initialize so we can use it.
 	}
 	Logger.log("Main", "Initializing configuration...");
@@ -57,14 +57,17 @@ public class Main extends SingleFrameApplication {
 	//# Load the configuration file
 	_loader = new Loader();
 
-	Set extensions = _loader._extensions.keySet();
-
-	for(Object s : _loader._extensions.keySet()) {
-	    Logger.log("Main", "Starting "+s+" extension on port "+_loader._extensions.get(s)+"...");
-	    Server server = new Server( (String)s, Integer.parseInt( (String)_loader._extensions.get(s)) );
-	    new Thread(server).start();
+	try {
+	    for (int i = 0; i < _loader._extensions.size(); i++) {
+		JSONObject e = (JSONObject)_loader._extensions.get(i);
+		Logger.log("Main", "Starting " + e.get("name") + " extension on port "  +e.get("port"));
+		Server server = new Server((String) e.get("name"), Integer.parseInt(e.get("port").toString()));
+		new Thread(server).start();
+	    }
+	} catch (Exception e) {
+	    Logger.log("Main", e.toString());
 	}
 
-	
+
     }
 }

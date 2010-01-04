@@ -2,71 +2,89 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package net.smartsocket;
 
-import java.io.File;
-import java.util.HashMap;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import java.io.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 /**
  *
  * @author XaeroDegreaz
  */
 public class Loader {
-    public static HashMap _constants = new HashMap();
-    public static HashMap _extensions = new HashMap();
 
-    public Loader () {
+    JSONObject _config = null;
+    JSONObject _constants = new JSONObject();
+    JSONArray _extensions = new JSONArray();
+
+    public Loader() {
 	try {
-	    File file = new File("Config.xml");
-	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder db = dbf.newDocumentBuilder();
-	    Document doc = db.parse(file);
+	    //# First we need to open up the Config.json file so that we can parse its information
+	    StringBuffer fileData = new StringBuffer();
+	    BufferedReader reader = new BufferedReader(new FileReader("Config.json"));
+	    char[] buffer = new char[4096];
+	    int numRead = 0;
 
-	    doc.getDocumentElement().normalize();
+	    while ((numRead = reader.read(buffer)) != -1) {
+		fileData.append(buffer, 0, numRead);
+	    }
+	    reader.close();
 
-	    NodeList constantsList = doc.getElementsByTagName("constants");
-	    NodeList extensionsList = doc.getElementsByTagName("extensions");
+	    _config = (JSONObject)JSONValue.parse(fileData.toString());
 
-	    NodeList constants = constantsList.item(0).getChildNodes();
-	    NodeList extensions = extensionsList.item(0).getChildNodes();
+	    JSONArray constants = (JSONArray) _config.get("constants");
 
+	    for (int i = 0; i < constants.size(); i++) {
+		JSONObject c = (JSONObject) constants.get(i);
+		this._constants.put(c.get("name").toString(), c.get("value"));
+	    }
 
+	    try {
+		File u;
+		u = new File("" + _constants.get("EXTENSION_DIR"));
+		ClassPathHacker.addFile(u);
+	    } catch (Exception e) {
+		e.printStackTrace();
+		Logger.log("Loader", "Error setting classpath.");
+	    }
 
-	    for (int i = 0; i < constants.getLength(); i++) {
-		Node e = constants.item(i);
-		if(e.getNodeType() == Node.ELEMENT_NODE) {
-		    _constants.put(e.getNodeName(), e.getTextContent());
-		    Logger.log("Loader", "Setting constant "+e.getNodeName()+" to "+e.getTextContent());
-		    
+	    //# Setup the server to compile classes.
+	    com.sun.tools.javac.Main javac = new com.sun.tools.javac.Main();
+
+	    //# Setup extensions...
+	    _extensions = (JSONArray) _config.get("extensions");
+	    
+	    for (int i = 0; i < _extensions.size(); i++) {
+		JSONObject e = (JSONObject) _extensions.get(i);
+		System.out.println(i);
+
+		if ((Boolean)e.get("enabled") == true) {
+		    if ((String)e.get("extends") == null) {
+			Logger.log("Loader", "No parent class for " + e.get("name"));
+		    }else {
+			String[] f = new String[]{"./" + _constants.get("EXTENSION_DIR") + "/" + e.get("extends") + "/" + e.get("extends") + ".java"};
+			javac.compile(f);
+			
+			Logger.log("Loader", "Compiling parent extension " + e.get("extends") + " for " + e.get("name"));
+		    }
+
+		    String[] f = new String[]{"./" + _constants.get("EXTENSION_DIR") + "/" + e.get("name") + "/" + e.get("name") + ".java"};
+		    javac.compile(f);
+		    Logger.log("Loader", "Compiling extension  " + e.get("name") + " to listen on " + e.get("port"));
+
+		}else {
+		    Logger.log("Loader", "Should be trying to remove "+i+" : "+_extensions.get(i).toString());
+		   // _extensions.remove(i);
+		    //i--;
 		}
 	    }
 
-	    for (int i = 0; i < extensions.getLength(); i++) {
-		Node e = extensions.item(i);
-		if(e.getNodeType() == Node.ELEMENT_NODE) {
-		    NamedNodeMap a = e.getAttributes();
-
-		    _extensions.put(
-			    a.getNamedItem("name").getNodeValue(),
-			    a.getNamedItem("port").getNodeValue()
-			    );
-		    Logger.log("Loader", "Setting up extension  "+a.getNamedItem("name").getNodeValue()+" to listen on "+a.getNamedItem("port").getNodeValue());
-		    
-		}
-	    }
-
-	}catch(Exception e) {
+	} catch (Exception e) {
 	    e.printStackTrace();
 	    Logger.log("Loader", e.toString());
 	}
 
     }
-
 }

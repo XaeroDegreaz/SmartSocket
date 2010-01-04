@@ -1,12 +1,11 @@
-
+package Example;
 import java.net.Socket;
-import net.smartsocket.Logger;
 import org.json.simple.JSONObject;
 
 public class Example {
 
     public Example() {
-	System.out.println("Constructor called.");
+	System.out.println("Example called.");
     }
 
     public void onConnect(Socket socket) {
@@ -42,8 +41,5 @@ public class Example {
 
     public void login(Socket socket, Object jsonObject) {
 	JSONObject json = (JSONObject) jsonObject;
-	System.out.println("Login called =>."+json.get("c").toString());
-	System.out.println("Username =>."+json.get("username").toString());
-	System.out.println("Password =>."+json.get("password").toString());
     }
 }

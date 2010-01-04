@@ -1,24 +1,22 @@
+package SmartLobby;
 
-import java.net.Socket;
-import net.smartsocket.Logger;
-import org.json.simple.JSONObject;
+import net.smartsocket.ThreadHandler;
 
 public class SmartLobby {
 
-    public SmartLobby() {
-	System.out.println("Constructor called.");
+    public void SmartLobby() {
+	System.out.println("I have been called..");
     }
 
-    public void onConnect(Socket socket) {
+    public void onConnect(ThreadHandler thread) {
 	System.out.println("onConnect called.");
-    }
-
-    public void onDisconnect(Socket socket) {
 
     }
 
-    public void onReceive(Socket socket, Object data) {
+    public void onDisconnect(ThreadHandler thread) {
+    }
 
+    public void onReceive(ThreadHandler thread, Object data) {
     }
 
     /*
@@ -35,12 +33,8 @@ public class SmartLobby {
      *
      * would call
      *
-     * public void login(Socket socket, Object dataObject) { //# Login logic here }
+     * public void login(ThreadHandler thread, Object dataObject) { //# Login logic here }
      *
      */
-
-    public void login(Socket socket, Object jsonObject) {
-	JSONObject json = (JSONObject) jsonObject;
-	System.out.println("Login called =>."+json.get("c").toString());
-    }
+    
 }

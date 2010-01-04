@@ -7,15 +7,14 @@ package net.smartsocket;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Vector;
-import org.xml.sax.DocumentHandler;
-import org.json.simple.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 /**
  *
@@ -56,30 +55,45 @@ public class ThreadHandler extends Thread implements Runnable {
 		}
 		}*/
 		try {
-		
-		//String s = "{\"c\":\"login\"}";
-		System.out.println("Receiving: "+line);
-		Object obj = JSONValue.parse(line);
-		JSONObject obj2 = (JSONObject) obj;
 
-		String command = obj2.get("c").toString();
+		    //# Here we parse the input from the client.
+		    //# The input will be a JSON array.
+		    /*
+		     * Example JSON string input received
+		     * ["MethodName",
+		     *	    {
+		     *		"paramName":"paramValue",
+		     *		"anotherParam":"anotherValue"
+		     *	    }
+		     * ]
+		     */
+		    Object jsonObj = JSONValue.parse(line);
+		    JSONArray json = (JSONArray) jsonObj;
 
-		Class[] args = new Class[2];
-		args[0] = Socket.class;
-		args[1] = Object.class;
+		    //# We will call this method in our extension.
+		    String method = json.get(0).toString();
+		    //# We will send these parameters to the above method.
+		    JSONObject parameters = (JSONObject) json.get(1);
 
-		Object params[] = {socket, obj};
+		    //# Prepare to invoke the dynamically called method
+		    Class[] args = new Class[2];
+		    args[0] = ThreadHandler.class;
+		    args[1] = JSONObject.class;
+		    Method m = _server._extension.getMethod(method, args);
+		    
+		    //# Here we finally invoke the method on our extension with the data collected from above.
+		    Object params[] = {this, parameters};
+		    m.invoke(_server._extensionInstance, params);
 
-		Method m = _server._extension.getMethod(command, args);
-		m.invoke(_server._extensionInstance, params);
-
-		}catch(Exception e) {
+		} catch (Exception e) {
 		    e.printStackTrace();
+		    Logger.log("ThreadHandler", e.toString());
 		}
 
 	    }
 	} catch (IOException ioe) {
 	    ioe.printStackTrace();
+	    Logger.log("ThreadHandler", ioe.toString());
 	} finally {
 	    try {
 		in.close();
@@ -93,6 +107,15 @@ public class ThreadHandler extends Thread implements Runnable {
 
 	    }
 	}
+    }
+
+    public void sendSelf(String data) {
+	this.out.println(data+"\r");
+	this.out.flush();
+    }
+
+    public void sendAll(Object data) {
+	
     }
 }
 

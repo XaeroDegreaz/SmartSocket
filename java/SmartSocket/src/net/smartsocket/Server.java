@@ -3,9 +3,8 @@ package net.smartsocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
-import bsh.Interpreter;
-import java.lang.String;
 import java.lang.reflect.Method;
+import java.sql.Connection;
 
 public class Server implements Runnable {
 
@@ -16,23 +15,25 @@ public class Server implements Runnable {
     public String extension;
     public Class _extension;
     public Object _extensionInstance;
+    public static Connection conn = null;
 
     public Server(String extension, int port) {
 	this.serverPort = port;
 	this.extension = extension;
-
-	Interpreter i = new Interpreter();
+	
 	try {
-	    //# Use BeanShell to grab the extension source.
-	    //i.source("./extensions/"+extension+"/"+extension+".java");
-	    //# use BeanShell to eval the source and create a Class object
-	    Class c = (Class) i.eval("source(\"./extensions/" + extension + "/" + extension + ".java\")");
-	    //# Create a new isntance of the extension's class
+	   
+	    ClassLoader cl = Server.class.getClassLoader();	    
+	    Class c = cl.loadClass(extension + "." + extension);	    
+
 	    this._extensionInstance = c.newInstance();
 	    this._extension = _extensionInstance.getClass();
+
 	} catch (Exception e) {
+	    e.printStackTrace();
 	    Logger.log("Server", e.toString());
 	}
+	//# Create a new isntance of the extension's class
 
     }
 
@@ -47,7 +48,7 @@ public class Server implements Runnable {
 	    Socket clientSocket = null;
 	    try {
 		clientSocket = this.serverSocket.accept();
-		
+
 		try {
 		    Class[] args = new Class[1];
 		    args[0] = Socket.class;

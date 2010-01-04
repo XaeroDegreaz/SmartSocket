@@ -73,14 +73,16 @@
     -->
     <target name="-post-jar">
         <jar jarfile="SmartSocket.jar">
-            <zipfileset src="${dist.jar}" excludes="META-INF/*" />
+           <zipfileset src="${dist.jar}" excludes="META-INF/*" />
            <zipfileset src="dist/lib/appframework-1.0.3.jar" excludes="META-INF/*" />
            <zipfileset src="dist/lib/swing-worker-1.1.jar" excludes="META-INF/*" />
-	   <zipfileset src="dist/lib/bsh-2.0b4.jar" excludes="META-INF/*" />
 	   <zipfileset src="dist/lib/json_simple-1.1.jar" excludes="META-INF/*" />
+	   <zipfileset src="dist/lib/tools.jar" excludes="META-INF/*" />
+	   <zipfileset src="dist/lib/mysql-connector-java-5.1.10-bin.jar" excludes="META-INF/*" />
+
             <manifest>
                 <attribute name="Main-Class" value="net.smartsocket.Main"/>
-		<attribute name="Class-Path" value="./extensions/"/>
+		<!--<attribute name="Class-Path" value="./extensions/"/>-->
             </manifest>
         </jar>
     </target>

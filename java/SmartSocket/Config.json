@@ -1,0 +1,30 @@
+{ 
+    "constants":[
+	{	    
+	    "name" : "DATA_PROTOCOL",
+	    "value" : "json"
+	},
+	
+	{
+	    "name" : "EXTENSION_DIR",
+	    "value" : "extensions" 
+	},
+
+	{
+	    
+	    "name" : "USE_ZLIB",
+	    "value" : false
+	}
+    ],
+
+    "extensions":[
+
+	{
+	    "name" : "TacticsOfWar",
+	    "extends" : "SmartLobby",
+	    "port" : 8888,
+	    "enabled" : true
+	},
+
+    ]
+}
