@@ -21,7 +21,6 @@
 
 	{
 	    "name" : "TacticsOfWar",
-	    "extends" : "SmartLobby",
 	    "port" : 8888,
 	    "enabled" : true
 	},

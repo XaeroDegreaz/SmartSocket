@@ -61,19 +61,10 @@ public class Loader {
 		System.out.println(i);
 
 		if ((Boolean)e.get("enabled") == true) {
-		    if ((String)e.get("extends") == null) {
-			Logger.log("Loader", "No parent class for " + e.get("name"));
-		    }else {
-			String[] f = new String[]{"./" + _constants.get("EXTENSION_DIR") + "/" + e.get("extends") + "/" + e.get("extends") + ".java"};
-			javac.compile(f);
-			
-			Logger.log("Loader", "Compiling parent extension " + e.get("extends") + " for " + e.get("name"));
-		    }
-
+		    
 		    String[] f = new String[]{"./" + _constants.get("EXTENSION_DIR") + "/" + e.get("name") + "/" + e.get("name") + ".java"};
 		    javac.compile(f);
 		    Logger.log("Loader", "Compiling extension  " + e.get("name") + " to listen on " + e.get("port"));
-
 		}else {
 		    Logger.log("Loader", "Should be trying to remove "+i+" : "+_extensions.get(i).toString());
 		   // _extensions.remove(i);

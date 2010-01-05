@@ -61,7 +61,7 @@ public class Main extends SingleFrameApplication {
 	    for (int i = 0; i < _loader._extensions.size(); i++) {
 		JSONObject e = (JSONObject)_loader._extensions.get(i);
 		Logger.log("Main", "Starting " + e.get("name") + " extension on port "  +e.get("port"));
-		Server server = new Server((String) e.get("name"), Integer.parseInt(e.get("port").toString()));
+		Server server = new Server(e, Integer.parseInt(e.get("port").toString()));
 		new Thread(server).start();
 	    }
 	} catch (Exception e) {

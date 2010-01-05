@@ -1,5 +1,5 @@
 package Example;
-import java.net.Socket;
+import net.smartsocket.ThreadHandler;
 import org.json.simple.JSONObject;
 
 public class Example {
@@ -8,38 +8,48 @@ public class Example {
 	System.out.println("Example called.");
     }
 
-    public void onConnect(Socket socket) {
+    public void onConnect(ThreadHandler thread) {
 	System.out.println("onConnect called.");
     }
 
-    public void onDisconnect(Socket socket) {
+    public void onDisconnect(ThreadHandler thread) {
 	System.out.println("onDisconnect called.");
     }
 
-    public void onReceive(Socket socket, Object data) {
+    public void onReceive(ThreadHandler thread, JSONObject json) {
 	//# No longer used at this time.
     }
 
     /*
      * The rest of the extension's application logic will go down here.
      *
-     * When the onReceive method is called, it will parse the XML or JSON
-     * and will call the corresponding method named after the node/object name.
+     * When the onReceive method is called, it will parse the JSON
+     * and will call the corresponding method named after the array's first (0) key name
+     * and pass the second (1) object as parameters.
      *
-     * Simple XML Example:
-     * <login username='XaeroDegreaz' password='SmartSocket' />
      *
      * Simple JSON Example:
-     * {"c":"login","username":"XaeroDegreaz","password":"SmartSocket"}
+     *	["helloWorld",{
+     *	    "paramName" : "hello",
+     *	    "anotherParam" : "world"
+     *	    }
+     *	]
      *
      * would call
      *
-     * public void login(Socket socket, Object dataObject) { //# Login logic here }
+     * public void helloWorld(ThreadHandler thread, JSONObject json) { //# Method logic here }
      *
      */
 
 
-    public void login(Socket socket, Object jsonObject) {
-	JSONObject json = (JSONObject) jsonObject;
+    public void helloWorld(ThreadHandler thread, JSONObject json) {
+	System.out.println(json.toJSONString());
+	
+	String paramName = (String)json.get("paramName");
+	String anotherParam = (String)json.get("anotherParam");
+
+	System.out.println("paramName=>"+paramName+" / anotherParam=>"+anotherParam);
+	//# If using the above example JSON data prints
+	//# paramName=>hello / anotherParam=>world
     }
 }

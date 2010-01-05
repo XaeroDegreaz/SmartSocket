@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import org.json.simple.JSONObject;
 
 public class Server implements Runnable {
 
@@ -12,19 +13,20 @@ public class Server implements Runnable {
     protected ServerSocket serverSocket = null;
     protected boolean isStopped = false;
     protected Thread runningThread = null;
-    public String extension;
+    public JSONObject extension;
     public Class _extension;
     public Object _extensionInstance;
     public static Connection conn = null;
 
-    public Server(String extension, int port) {
+    public Server(JSONObject extension, int port) {
 	this.serverPort = port;
 	this.extension = extension;
 	
 	try {
-	   
-	    ClassLoader cl = Server.class.getClassLoader();	    
-	    Class c = cl.loadClass(extension + "." + extension);	    
+	   Class c;
+	    ClassLoader cl = Server.class.getClassLoader();
+	    
+	    c = cl.loadClass(extension.get("name").toString() + "." + extension.get("name").toString());
 
 	    this._extensionInstance = c.newInstance();
 	    this._extension = _extensionInstance.getClass();
@@ -48,15 +50,6 @@ public class Server implements Runnable {
 	    Socket clientSocket = null;
 	    try {
 		clientSocket = this.serverSocket.accept();
-
-		try {
-		    Class[] args = new Class[1];
-		    args[0] = Socket.class;
-		    Method m = _extension.getMethod("onConnect", args);
-		    m.invoke(_extensionInstance, clientSocket);
-		} catch (Exception e) {
-		    Logger.log(extension, "This extension does not have an onConnect method!");
-		}
 
 	    } catch (IOException e) {
 		if (isStopped()) {

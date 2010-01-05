@@ -36,6 +36,17 @@ public class ThreadHandler extends Thread implements Runnable {
 		new InputStreamReader(socket.getInputStream()));
 	out = new PrintWriter(
 		new OutputStreamWriter(socket.getOutputStream()));
+
+	try {
+	    Class[] args = new Class[1];
+	    args[0] = ThreadHandler.class;
+	    Method m = _server._extension.getMethod("onConnect", args);
+	    m.invoke(_server._extensionInstance, this);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    Logger.log(_server.extension.get("name").toString(), "This extension does not have an onConnect method!");
+	}
+
     }
 
     public void run() {
@@ -69,6 +80,7 @@ public class ThreadHandler extends Thread implements Runnable {
 		     */
 		    Object jsonObj = JSONValue.parse(line);
 		    JSONArray json = (JSONArray) jsonObj;
+		    System.out.println(line.toString());
 
 		    //# We will call this method in our extension.
 		    String method = json.get(0).toString();
@@ -80,7 +92,7 @@ public class ThreadHandler extends Thread implements Runnable {
 		    args[0] = ThreadHandler.class;
 		    args[1] = JSONObject.class;
 		    Method m = _server._extension.getMethod(method, args);
-		    
+
 		    //# Here we finally invoke the method on our extension with the data collected from above.
 		    Object params[] = {this, parameters};
 		    m.invoke(_server._extensionInstance, params);
@@ -110,12 +122,11 @@ public class ThreadHandler extends Thread implements Runnable {
     }
 
     public void sendSelf(String data) {
-	this.out.println(data+"\r");
+	this.out.println(data + "\r");
 	this.out.flush();
     }
 
     public void sendAll(Object data) {
-	
     }
 }
 
