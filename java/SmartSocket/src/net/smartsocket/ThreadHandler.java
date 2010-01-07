@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Vector;
+import net.smartsocket.extensions.smartlobby.SmartLobby;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -24,8 +25,9 @@ public class ThreadHandler extends Thread implements Runnable {
 
     static Vector handlers = new Vector(10);
     private Socket socket;
+    public String threadId = null;
     private BufferedReader in;
-    private PrintWriter out;
+    public PrintWriter out;
     public Server _server;
     //static SmartSocketJAVAApp _server;
 
@@ -108,12 +110,15 @@ public class ThreadHandler extends Thread implements Runnable {
 	    Logger.log("ThreadHandler", ioe.toString());
 	} finally {
 	    try {
+		System.out.println("Stuff here??");
 		in.close();
 		out.close();
 		socket.close();
 	    } catch (IOException ioe) {
 	    } finally {
+		System.out.println("Stuff here too?!");
 		synchronized (handlers) {
+		    SmartLobby.onDisconnect(this);
 		    handlers.removeElement(this);
 		}
 

@@ -1,13 +1,18 @@
 package net.smartsocket.extensions.smartlobby;
 
 import net.smartsocket.ThreadHandler;
-import org.json.simple.JSONObject;
+import org.json.simple.*;
 
 /**
  *
  * @author XaeroDegreaz
  */
 public class SmartLobby {
+
+    public static JSONObject userObjects = new JSONObject();
+    public static int nextUserId = 0;
+    public static JSONArray roomObjects = new JSONArray();
+    public static int nextRoomId = 0;
 
     /**
      * Not used unless using SmartLobby only
@@ -29,7 +34,9 @@ public class SmartLobby {
      * Actions to perform when a client disconnects.
      * @param thread
      */
-    public void onDisconnect(ThreadHandler thread) {
+    public static void onDisconnect(ThreadHandler thread) {
+	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	uo.finalize();
     }
 
     /**
@@ -38,6 +45,16 @@ public class SmartLobby {
      * @param json
      */
     public void getRoomList(ThreadHandler thread, JSONObject json) {
+
+	JSONArray roomList = new JSONArray();
+	roomList.add("onRoomList");
+
+	for(int i = 0; i < roomObjects.size(); i++) {
+	    roomList.add(roomObjects.get(i));
+	}
+	thread.out.println(roomList.toString());
+	thread.out.flush();
+	System.out.println("Room List: "+roomList);
 
     }
 
@@ -48,6 +65,9 @@ public class SmartLobby {
      */
     public void getUserList(ThreadHandler thread, JSONObject json) {
 
+	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	uo._roomObject.getUserList(thread);
+	
     }
 
     /**
@@ -74,6 +94,18 @@ public class SmartLobby {
      * @param json
      */
     public void sendPrivate(ThreadHandler thread, JSONObject json) {
+	UserObject sender = (UserObject)userObjects.get(thread.threadId);
+	UserObject target = (UserObject)userObjects.get(json.get("_target"));
+
+	JSONArray a = new JSONArray();
+	a.add("onPrivateMessage");
+
+	JSONObject o = new JSONObject();
+	o.put("_sender", json.get("_message"));
+	a.add(o);
+
+	target._threadHandler.out.println(a);
+	target._threadHandler.out.flush();
 
     }
 
@@ -83,6 +115,10 @@ public class SmartLobby {
      * @param json
      */
     public void createRoom(ThreadHandler thread, JSONObject json) {
+	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	roomObjects.add(new RoomObject(uo, json));
+	
+	
 
     }
 
@@ -101,7 +137,13 @@ public class SmartLobby {
      * @param json
      */
     public void joinRoom(ThreadHandler thread, JSONObject json) {
+	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	//# Leave the old room.
+	uo._roomObject.onUserLeave(uo, uo._threadHandler);
 
+	RoomObject ro = (RoomObject)roomObjects.get(Integer.parseInt(json.get("_id").toString()));
+	uo._roomObject = ro;
+	ro.newUser(uo, thread);
     }
 
     /**
@@ -111,6 +153,20 @@ public class SmartLobby {
      */
     public void leaveRoom(ThreadHandler thread, JSONObject json) {
 
+	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	JSONObject o = new JSONObject();
+	o.put("_id", 0);
+
+	joinRoom(thread, o);
+    }
+
+    public void leaveLobby(ThreadHandler thread, JSONObject json) {
+	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	uo.finalize();
+    }
+
+    public void joinLobby(ThreadHandler thread) {
+	userObjects.put(thread.threadId, new UserObject(nextUserId, thread));
     }
     
 }
