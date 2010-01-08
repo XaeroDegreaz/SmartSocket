@@ -34,7 +34,7 @@ public class RoomObject extends JSONObject {
 	System.out.println("New RoomObject: " + this);
 
 	if (user._id != 0) {
-	    user._threadHandler.out.println("[\"onCreateRoom\",{\"id\":" + _id + "}]");
+	    user._threadHandler.out.print("[\"onCreateRoom\",{\"id\":" + _id + "}]");
 	    user._threadHandler.out.flush();
 
 	    JSONArray o = new JSONArray();
@@ -47,7 +47,7 @@ public class RoomObject extends JSONObject {
 
 		    ThreadHandler handler =
 			    (ThreadHandler) lobby._threads.elementAt(i);
-		    handler.out.println(o);
+		    handler.out.print(o);
 		    handler.out.flush();
 		}
 	    }
@@ -55,14 +55,18 @@ public class RoomObject extends JSONObject {
     }
 
     public void getUserList(ThreadHandler thread) {
+	JSONArray a = new JSONArray();
+	a.add("onUserList");
+
 	JSONArray userList = new JSONArray();
-	userList.add("onUserList");
 
 	for (int i = 0; i < _userList.size(); i++) {
 	    userList.add(_userList.get(i));
 	}
-	System.out.println(userList);
-	thread.sendSelf(userList.toString());
+	//System.out.println(a);
+	a.add(userList);
+	thread.out.print(a);
+	thread.out.flush();
     }
 
     public void newUser(UserObject uo, ThreadHandler thread) {
@@ -86,7 +90,16 @@ public class RoomObject extends JSONObject {
 	_threads.add(thread);
 
 	System.out.println(_userList);
-	thread.sendSelf("[\"onJoinRoom\"]");
+
+	JSONArray a = new JSONArray();
+	a.add("onRoomJoin");
+
+	JSONObject o = new JSONObject();
+	o.put("_id", _id);
+
+	a.add(o);
+	thread.out.print(a);
+	thread.out.flush();
 
     }
 
@@ -103,7 +116,7 @@ public class RoomObject extends JSONObject {
 
 		ThreadHandler handler =
 			(ThreadHandler) _threads.elementAt(i);
-		handler.out.println(leaveUser);
+		handler.out.print(leaveUser);
 		handler.out.flush();
 	    }
 	}
@@ -113,17 +126,21 @@ public class RoomObject extends JSONObject {
     }
 
     public void sendRoom(UserObject user, JSONObject json) {
-	JSONArray o = new JSONArray();
-	o.add("onRoomMessage");
+	JSONArray a = new JSONArray();
+	a.add("onMessageRoom");
 
-	json.put("_username", json.get("_username"));
-	o.add(json);
+	JSONObject o = new JSONObject();
+	o.put("_username", user._username);
+	o.put("_message", json.get("_message"));
+	
+	a.add(o);
+
 	for (int i = 0; i < _threads.size(); i++) {
 	    synchronized (_threads) {
 
 		ThreadHandler handler =
 			(ThreadHandler) _threads.elementAt(i);
-		handler.out.println(o);
+		handler.out.print(a);
 		handler.out.flush();
 	    }
 	}
@@ -150,7 +167,7 @@ public class RoomObject extends JSONObject {
 
 		ThreadHandler handler =
 			(ThreadHandler) lobby._threads.elementAt(i);
-		handler.out.println(o);
+		handler.out.print(o);
 		handler.out.flush();
 	    }
 	}
@@ -171,7 +188,7 @@ public class RoomObject extends JSONObject {
 
 		ThreadHandler handler =
 			(ThreadHandler) lobby._threads.elementAt(i);
-		handler.out.println(o);
+		handler.out.print(o);
 		handler.out.flush();
 	    }
 	}

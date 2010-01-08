@@ -35,7 +35,7 @@ public class UserObject extends JSONObject  {
 	    a.add("onJoinLobby");
 	    a.add(this);
 
-	    _threadHandler.out.println(a);
+	    _threadHandler.out.print(a);
 	    _threadHandler.out.flush();
 	}else {
 	    this._username = "Server";

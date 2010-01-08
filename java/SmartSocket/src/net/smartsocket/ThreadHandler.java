@@ -127,7 +127,7 @@ public class ThreadHandler extends Thread implements Runnable {
     }
 
     public void sendSelf(String data) {
-	this.out.println(data + "\r");
+	this.out.print(data + "\r");
 	this.out.flush();
     }
 

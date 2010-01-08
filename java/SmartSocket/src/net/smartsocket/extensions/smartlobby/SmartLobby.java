@@ -46,15 +46,20 @@ public class SmartLobby {
      */
     public void getRoomList(ThreadHandler thread, JSONObject json) {
 
+	JSONArray a = new JSONArray();
+	a.add("onRoomList");
+
 	JSONArray roomList = new JSONArray();
-	roomList.add("onRoomList");
 
 	for(int i = 0; i < roomObjects.size(); i++) {
 	    roomList.add(roomObjects.get(i));
 	}
-	thread.out.println(roomList.toString());
+
+	a.add(roomList);
+	
+	thread.out.print(a.toString());
 	thread.out.flush();
-	System.out.println("Room List: "+roomList);
+	System.out.println("Room List: "+a);
 
     }
 
@@ -76,7 +81,8 @@ public class SmartLobby {
      * @param json
      */
     public void sendRoom(ThreadHandler thread, JSONObject json) {
-
+	UserObject sender = (UserObject)userObjects.get(thread.threadId);
+	sender._roomObject.sendRoom(sender, json);
     }
 
     /**
@@ -104,7 +110,7 @@ public class SmartLobby {
 	o.put("_sender", json.get("_message"));
 	a.add(o);
 
-	target._threadHandler.out.println(a);
+	target._threadHandler.out.print(a);
 	target._threadHandler.out.flush();
 
     }
@@ -139,7 +145,9 @@ public class SmartLobby {
     public void joinRoom(ThreadHandler thread, JSONObject json) {
 	UserObject uo = (UserObject)userObjects.get(thread.threadId);
 	//# Leave the old room.
-	uo._roomObject.onUserLeave(uo, uo._threadHandler);
+	if(uo._roomObject != null) {
+	    uo._roomObject.onUserLeave(uo, uo._threadHandler);
+	}
 
 	RoomObject ro = (RoomObject)roomObjects.get(Integer.parseInt(json.get("_id").toString()));
 	uo._roomObject = ro;
