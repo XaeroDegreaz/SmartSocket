@@ -20,7 +20,7 @@
     "extensions":[
 
 	{
-	    "name" : "TacticsOfWar",
+	    "name" : "Example",
 	    "port" : 8888,
 	    "enabled" : true
 	},

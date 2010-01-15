@@ -34,9 +34,11 @@ public class SmartLobby {
      * Actions to perform when a client disconnects.
      * @param thread
      */
-    public static void onDisconnect(ThreadHandler thread) {
-	UserObject uo = (UserObject)userObjects.get(thread.threadId);
-	uo.finalize();
+    public static void onDisconnect(String unique_identifier) {
+	if(!unique_identifier.equals("<policy-file-request/>")) {
+	    UserObject uo = (UserObject)userObjects.get(unique_identifier);
+	    uo.finalize();
+	}
     }
 
     /**
@@ -51,14 +53,13 @@ public class SmartLobby {
 
 	JSONArray roomList = new JSONArray();
 
-	for(int i = 0; i < roomObjects.size(); i++) {
-	    roomList.add(roomObjects.get(i));
-	}
+//	for(int i = 0; i < roomObjects.size(); i++) {
+//	    roomList.add(roomObjects.get(i));
+//	}
 
-	a.add(roomList);
-	
-	thread.out.print(a.toString());
-	thread.out.flush();
+	a.add(roomObjects);
+
+	thread.send(a);
 	System.out.println("Room List: "+a);
 
     }
@@ -70,7 +71,7 @@ public class SmartLobby {
      */
     public void getUserList(ThreadHandler thread, JSONObject json) {
 
-	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	UserObject uo = getUserObject(thread.unique_identifier);
 	uo._roomObject.getUserList(thread);
 	
     }
@@ -81,7 +82,7 @@ public class SmartLobby {
      * @param json
      */
     public void sendRoom(ThreadHandler thread, JSONObject json) {
-	UserObject sender = (UserObject)userObjects.get(thread.threadId);
+	UserObject sender = getUserObject(thread.unique_identifier);
 	sender._roomObject.sendRoom(sender, json);
     }
 
@@ -100,18 +101,19 @@ public class SmartLobby {
      * @param json
      */
     public void sendPrivate(ThreadHandler thread, JSONObject json) {
-	UserObject sender = (UserObject)userObjects.get(thread.threadId);
-	UserObject target = (UserObject)userObjects.get(json.get("_target"));
+	UserObject sender = getUserObject(thread.unique_identifier);
+	UserObject target = getUserObject(json.get("_target").toString());
 
 	JSONArray a = new JSONArray();
-	a.add("onPrivateMessage");
+	a.add("onMessagePrivate");
 
 	JSONObject o = new JSONObject();
-	o.put("_sender", json.get("_message"));
+	o.put("Sender", sender._username);
+	o.put("Message", json.get("_message"));
+	o.put("uid", sender._threadHandler.unique_identifier);
 	a.add(o);
 
-	target._threadHandler.out.print(a);
-	target._threadHandler.out.flush();
+	target._threadHandler.send(a);
 
     }
 
@@ -121,7 +123,7 @@ public class SmartLobby {
      * @param json
      */
     public void createRoom(ThreadHandler thread, JSONObject json) {
-	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	UserObject uo = getUserObject(thread.unique_identifier);
 	roomObjects.add(new RoomObject(uo, json));
 	
 	
@@ -143,15 +145,24 @@ public class SmartLobby {
      * @param json
      */
     public void joinRoom(ThreadHandler thread, JSONObject json) {
-	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	UserObject uo = getUserObject(thread.unique_identifier);
 	//# Leave the old room.
 	if(uo._roomObject != null) {
+	    System.out.println("User was found in a room. We are attempting to remove.");
 	    uo._roomObject.onUserLeave(uo, uo._threadHandler);
+	    System.out.println("Leave successfull?");
 	}
 
-	RoomObject ro = (RoomObject)roomObjects.get(Integer.parseInt(json.get("_id").toString()));
-	uo._roomObject = ro;
-	ro.newUser(uo, thread);
+	for(int i = 0; i < roomObjects.size(); i++) {
+	    RoomObject ro = (RoomObject)roomObjects.get(i);
+
+	    if(ro._id == Integer.parseInt(json.get("_id").toString())) {
+		uo._roomObject = ro;
+		ro.newUser(uo, thread);
+		break;
+	    }
+	    
+	}
     }
 
     /**
@@ -161,7 +172,7 @@ public class SmartLobby {
      */
     public void leaveRoom(ThreadHandler thread, JSONObject json) {
 
-	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	UserObject uo = getUserObject(thread.unique_identifier);
 	JSONObject o = new JSONObject();
 	o.put("_id", 0);
 
@@ -169,12 +180,37 @@ public class SmartLobby {
     }
 
     public void leaveLobby(ThreadHandler thread, JSONObject json) {
-	UserObject uo = (UserObject)userObjects.get(thread.threadId);
+	UserObject uo = getUserObject(thread.unique_identifier);
 	uo.finalize();
     }
 
-    public void joinLobby(ThreadHandler thread) {
-	userObjects.put(thread.threadId, new UserObject(nextUserId, thread));
+    public void login(ThreadHandler thread, JSONObject json) {
+
+    }
+    
+    public UserObject joinLobby(ThreadHandler thread, JSONObject json) {
+	JSONArray u = new JSONArray();
+	u.add(json.get("_username"));
+	u.add(nextUserId);
+
+	//# Create a new user object with the threads unique identifier as the key
+	userObjects.put(thread.unique_identifier, new UserObject(u, thread));
+
+	//# Return the new user object to the caller so that they can setup any
+	//# custom UserObject JSON properties
+	UserObject newUserObject = getUserObject(thread.unique_identifier);
+	return newUserObject;
+    }
+
+
+    public UserObject getUserObject(String unique_identifier) {
+	UserObject uo = (UserObject)userObjects.get(unique_identifier);
+	return uo;
+    }
+
+    public RoomObject getRoomObject(UserObject uo) {
+	RoomObject ro = uo._roomObject;
+	return ro;
     }
     
 }

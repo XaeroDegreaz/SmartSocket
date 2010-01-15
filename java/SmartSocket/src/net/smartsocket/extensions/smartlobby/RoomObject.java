@@ -21,24 +21,32 @@ public class RoomObject extends JSONObject {
     public int _id = 0;
     public String _status = "Waiting";
 
+    //# Team specifit arrays
+    public JSONObject _teamList = new JSONObject();
+
     public RoomObject(UserObject user, JSONObject json) {
 	_id = SmartLobby.nextRoomId;
-	this.put("_id", _id);
-	this.put("_name", json.get("_name"));
-	this.put("_maxUsers", Integer.parseInt(json.get("_maxUsers").toString()));
-	this.put("_currentUsers", 0);
-	this.put("_private", Boolean.parseBoolean(json.get("_private").toString()));
-	this.put("_status", _status);
-	this.put("_creator", user);
+	this.put("ID", _id);
+	this.put("Name", json.get("_name"));
+	this.put("Max", Integer.parseInt(json.get("_maxUsers").toString()));
+	this.put("Current", 0);
+	this.put("Private", Boolean.parseBoolean(json.get("_private").toString()));
+	this.put("Status", _status);
+	this.put("Creator", user._username);
+
+	//# Team Stuff
+	_teamList.put("unassigned", new JSONArray());
+	_teamList.put("red", new JSONArray());
+	_teamList.put("blue", new JSONArray());
+	
 	SmartLobby.nextRoomId++;
 	System.out.println("New RoomObject: " + this);
 
 	if (user._id != 0) {
-	    user._threadHandler.out.print("[\"onCreateRoom\",{\"id\":" + _id + "}]");
-	    user._threadHandler.out.flush();
+	    user._threadHandler.send("[\"onCreateRoom\",{\"_id\":" + _id + "}]");
 
 	    JSONArray o = new JSONArray();
-	    o.add("onNewRoom");
+	    o.add("onRoomAdd");
 	    o.add(this);
 
 	    RoomObject lobby = (RoomObject) SmartLobby.roomObjects.get(0);
@@ -47,14 +55,15 @@ public class RoomObject extends JSONObject {
 
 		    ThreadHandler handler =
 			    (ThreadHandler) lobby._threads.elementAt(i);
-		    handler.out.print(o);
-		    handler.out.flush();
+		    handler.send(o);
 		}
 	    }
+	}else {
+	    //_currentUsers = 0;
 	}
     }
 
-    public void getUserList(ThreadHandler thread) {
+    public synchronized void getUserList(ThreadHandler thread) {
 	JSONArray a = new JSONArray();
 	a.add("onUserList");
 
@@ -65,29 +74,39 @@ public class RoomObject extends JSONObject {
 	}
 	//System.out.println(a);
 	a.add(userList);
-	thread.out.print(a);
-	thread.out.flush();
+	thread.send(a);
     }
 
-    public void newUser(UserObject uo, ThreadHandler thread) {
+    public synchronized void newUser(UserObject uo, ThreadHandler thread) {
+	uo._team = "unassigned";
+	
 	JSONArray newUser = new JSONArray();
 	newUser.add("onUserJoin");
-	newUser.add(uo);
+
+	JSONObject obj = new JSONObject();
+	obj.put("Username", uo._username);
+	obj.put("fb_id", uo._threadHandler.unique_identifier);
+
+	newUser.add(obj);
+	
 	for (int i = 0; i < _threads.size(); i++) {
 	    synchronized (_threads) {
 
 		ThreadHandler handler =
 			(ThreadHandler) _threads.elementAt(i);
-		handler.out.println(newUser);
-		handler.out.flush();
+		handler.send(newUser);
 	    }
 	}
-
-	this.put("_currentUsers", _currentUsers++);
-	onUserCountChange(this);
+	
+	
+	
 
 	_userList.add(uo);
 	_threads.add(thread);
+
+	this.put("Current",_threads.size());
+
+	onRoomCountUpdate();
 
 	System.out.println(_userList);
 
@@ -95,33 +114,38 @@ public class RoomObject extends JSONObject {
 	a.add("onRoomJoin");
 
 	JSONObject o = new JSONObject();
-	o.put("_id", _id);
+	o.put("ID", _id);
+	o.put("fb_id", uo._threadHandler.unique_identifier);
+	
 
 	a.add(o);
-	thread.out.print(a);
-	thread.out.flush();
-
+	thread.send(a);
     }
 
     public void onUserLeave(UserObject user, ThreadHandler thread) {
 	_userList.remove(user);
 	_threads.removeElement(thread);
-	this.put("_currentUsers", _currentUsers--);
+	
+	this.put("Current", _threads.size());
 
 	JSONArray leaveUser = new JSONArray();
 	leaveUser.add("onUserLeave");
-	leaveUser.add(user);
+
+	JSONObject obj = new JSONObject();
+	obj.put("Username", user._username);
+
+	leaveUser.add(obj);
+	
 	for (int i = 0; i < _threads.size(); i++) {
 	    synchronized (_threads) {
 
 		ThreadHandler handler =
 			(ThreadHandler) _threads.elementAt(i);
-		handler.out.print(leaveUser);
-		handler.out.flush();
+		handler.send(leaveUser);
 	    }
 	}
 
-	onUserCountChange(this);
+	onRoomCountUpdate();
 
     }
 
@@ -130,8 +154,8 @@ public class RoomObject extends JSONObject {
 	a.add("onMessageRoom");
 
 	JSONObject o = new JSONObject();
-	o.put("_username", user._username);
-	o.put("_message", json.get("_message"));
+	o.put("Username", user._username);
+	o.put("Message", json.get("_message"));
 	
 	a.add(o);
 
@@ -140,25 +164,24 @@ public class RoomObject extends JSONObject {
 
 		ThreadHandler handler =
 			(ThreadHandler) _threads.elementAt(i);
-		handler.out.print(a);
-		handler.out.flush();
+		handler.send(a);
 	    }
 	}
     }
 
-    public void onUserCountChange(RoomObject room) {
+    public synchronized void onRoomCountUpdate() {
 	//# Check to see if the room now has 0 users. If so, delete the roo.
-	if(room._currentUsers < 1 && room._id != 0) {
+	if(_threads.size() < 1 && _id != 0) {
 	    finalize();
 	    return;
 	}
 	//# Send the event to users in the main lobby ( 0 )
 	JSONArray o = new JSONArray();
-	o.add("onUserCountChange");
+	o.add("onRoomCountUpdate");
 
 	JSONObject ro = new JSONObject();
-	ro.put("_currentUsers", Integer.parseInt(this.get("_currentUsers").toString()));
-	ro.put("_id", _id);
+	ro.put("Current", Integer.parseInt(this.get("Current").toString()));
+	ro.put("ID", _id);
 	o.add(ro);
 
 	RoomObject lobby = (RoomObject) SmartLobby.roomObjects.get(0);
@@ -167,11 +190,13 @@ public class RoomObject extends JSONObject {
 
 		ThreadHandler handler =
 			(ThreadHandler) lobby._threads.elementAt(i);
-		handler.out.print(o);
-		handler.out.flush();
+		handler.send(o);
 	    }
 	}
+	System.out.println("Current users in "+get("Name")+" "+_threads.size());
     }
+
+    
 
     @Override
     public void finalize() {
@@ -179,7 +204,7 @@ public class RoomObject extends JSONObject {
 	o.add("onRoomDelete");
 
 	JSONObject ro = new JSONObject();
-	ro.put("_id", _id);
+	ro.put("ID", _id);
 	o.add(ro);
 
 	RoomObject lobby = (RoomObject) SmartLobby.roomObjects.get(0);
@@ -188,8 +213,7 @@ public class RoomObject extends JSONObject {
 
 		ThreadHandler handler =
 			(ThreadHandler) lobby._threads.elementAt(i);
-		handler.out.print(o);
-		handler.out.flush();
+		handler.send(o);
 	    }
 	}
 

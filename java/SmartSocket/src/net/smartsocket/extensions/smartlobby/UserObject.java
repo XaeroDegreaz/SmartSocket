@@ -16,31 +16,33 @@ public class UserObject extends JSONObject  {
 
     public int _id;
     public String _username;
-    public String test = "testing";
+    public String fb_id = null;
     public ThreadHandler _threadHandler = null;
     public RoomObject _roomObject = null;
 
-    public UserObject(int userId, ThreadHandler thread)  {
-	this._id = userId;
+    //# team stuff
+    public String _team = "unassigned";
+    public String _status = "";
 
-	if(userId != 0) {
-	    this._username = thread.threadId;
+    public UserObject(JSONArray userInfo, ThreadHandler thread)  {
+	_username = userInfo.get(0).toString();
+	_id = Integer.parseInt(userInfo.get(1).toString());
+
+	this.put("_id", _id);
+	this.put("Username", _username);
+
+	if(_id != 0) {
 	    //
-	    this._threadHandler = thread;
-	    //this.put("_id", _id);
-	    this.put("_username", thread.threadId);
-	    this.put("_id", _id);
+	    _threadHandler = thread;	    
 
 	    JSONArray a = new JSONArray();
 	    a.add("onJoinLobby");
 	    a.add(this);
 
-	    _threadHandler.out.print(a);
-	    _threadHandler.out.flush();
+	    _threadHandler.send(a);
 	}else {
-	    this._username = "Server";
-	    this.put("_username", "Server");
-	    this.put("_id", _id);
+	    _username = "Server";
+	    this.put("Username", "Server");
 	}
 
 	System.out.println("New UserObject: "+this);
@@ -53,7 +55,7 @@ public class UserObject extends JSONObject  {
 
     @Override
     public void finalize() {
-	this._roomObject.onUserLeave(this, _threadHandler);
+	_roomObject.onUserLeave(this, _threadHandler);
 	SmartLobby.userObjects.remove(this);
     }
 
