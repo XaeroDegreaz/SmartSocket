@@ -65,6 +65,19 @@ public class Loader {
 		    String[] f = new String[]{"./" + _constants.get("EXTENSION_DIR") + "/" + e.get("name") + "/" + e.get("name") + ".java"};
 		    javac.compile(f);
 		    Logger.log("Loader", "Compiling extension  " + e.get("name") + " to listen on " + e.get("port"));
+
+		    //# Compile helper classes
+		    JSONArray helpers = (JSONArray)e.get("helpers");
+
+		    if(helpers.size() > 0) {
+
+			for (int j = 0; j < helpers.size(); j++) {
+			    f = new String[]{"./" + _constants.get("EXTENSION_DIR") + "/" + e.get("name") + "/" + helpers.get(j) + ".java"};
+			    javac.compile(f);
+			    Logger.log("Loader", "Compiling "+e.get("name")+" helper " + helpers.get(i));
+			}
+		    }
+
 		}else {
 		    Logger.log("Loader", "Should be trying to remove "+i+" : "+_extensions.get(i).toString());
 		   // _extensions.remove(i);

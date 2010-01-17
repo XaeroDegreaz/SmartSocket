@@ -85,7 +85,7 @@ public class RoomObject extends JSONObject {
 
 	JSONObject obj = new JSONObject();
 	obj.put("Username", uo._username);
-	obj.put("fb_id", uo._threadHandler.unique_identifier);
+	obj.put("uid", uo._threadHandler.unique_identifier);
 
 	newUser.add(obj);
 	
@@ -115,7 +115,7 @@ public class RoomObject extends JSONObject {
 
 	JSONObject o = new JSONObject();
 	o.put("ID", _id);
-	o.put("fb_id", uo._threadHandler.unique_identifier);
+	o.put("uid", uo._threadHandler.unique_identifier);
 	
 
 	a.add(o);
@@ -133,6 +133,7 @@ public class RoomObject extends JSONObject {
 
 	JSONObject obj = new JSONObject();
 	obj.put("Username", user._username);
+	obj.put("Team", user._team);
 
 	leaveUser.add(obj);
 	
