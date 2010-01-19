@@ -4,9 +4,12 @@
  */
 package net.smartsocket;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -14,6 +17,8 @@ import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Collection;
 import java.util.Vector;
+import java.util.zip.Deflater;
+import java.util.zip.GZIPOutputStream;
 import net.smartsocket.extensions.smartlobby.SmartLobby;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -30,19 +35,27 @@ public class ThreadHandler extends Thread implements Runnable {
     public String unique_identifier = null;
     //public String unique_threadName = null;
     private BufferedReader in;
-    public PrintWriter out;
+    //public PrintWriter out;
+    //# Byte testing...
+    // private InputStream in;
+    public OutputStream out;
+    byte nullByte = '\u0000';
     public Server _server;
     private OutputStream policy_out;
-
     private String policy = "<cross-domain-policy>\n<allow-access-from domain='*' to-ports='*'/>\n</cross-domain-policy>";
 
     public ThreadHandler(Socket socket, Server server) throws IOException {
 	this.socket = socket;
 	_server = server;
+
 	in = new BufferedReader(
 		new InputStreamReader(socket.getInputStream()));
-	out = new PrintWriter(
-		new OutputStreamWriter(socket.getOutputStream()));
+//	out = new PrintWriter(
+//		new OutputStreamWriter(socket.getOutputStream()));
+
+	//in = socket.getInputStream();
+	out = socket.getOutputStream();
+
 	policy_out = socket.getOutputStream();
 
 	try {
@@ -59,7 +72,6 @@ public class ThreadHandler extends Thread implements Runnable {
 
     public void sendPolicy() {
 	try {
-	    byte nullByte = '\u0000';
 	    policy_out.write(policy.getBytes());
 	    policy_out.write(nullByte);
 	    policy_out.flush();
@@ -76,13 +88,13 @@ public class ThreadHandler extends Thread implements Runnable {
 	}
 	sendPolicy();
 	try {
-	    while (!(line = in.readLine()).equals(null)) {
-		System.out.println("INCOMING: "+line.toString());
+	    while ((line = in.readLine()) != null) {
+		System.out.println("INCOMING: " + line.toString());
 		//# let's check for cross domain policy first.
 		if (line.contains("<policy-file-request/>")) {
-		unique_identifier = "<policy-file-request/>";
+		    unique_identifier = "<policy-file-request/>";
 
-		   //sendPolicy();
+		    //sendPolicy();
 
 		} else {
 		    try {
@@ -126,7 +138,7 @@ public class ThreadHandler extends Thread implements Runnable {
 
 		}
 	    }
-	} catch (IOException ioe) {
+	} catch (Exception ioe) {
 	    ioe.printStackTrace();
 	    Logger.log("ThreadHandler", ioe.toString());
 	} finally {
@@ -135,10 +147,17 @@ public class ThreadHandler extends Thread implements Runnable {
 		out.close();
 		socket.close();
 	    } catch (IOException ioe) {
+		System.out.println("Closing streams seems to have failed: "+ioe);
 	    } finally {
 		synchronized (handlers) {
 		    SmartLobby.onDisconnect(unique_identifier);
 		    handlers.removeElement(this);
+		}
+
+		try {
+		    finalize();
+		}catch(Throwable e) {
+		    e.printStackTrace();
 		}
 
 	    }
@@ -147,13 +166,16 @@ public class ThreadHandler extends Thread implements Runnable {
     }
 
     public void send(Object data) {
+
 	try {
-//	    out = new PrintWriter(
-//		    new OutputStreamWriter(socket.getOutputStream()));
-	    out.print(data + "\r");
+	    //# We need to append a \r for SmartLobby on the client side.
+	    String toClient = data.toString() + "\r";
+	    //# Get the data being sent as bytes.
+	    byte[] bytes = toClient.getBytes("UTF-8");
+
+	    out.write(bytes);
 	    out.flush();
-	    System.out.println("SENT: "+data.toString());
-	    //out.close();
+	    System.out.println("SENT: " + data.toString());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}

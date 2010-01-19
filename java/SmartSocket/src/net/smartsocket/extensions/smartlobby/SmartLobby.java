@@ -181,14 +181,16 @@ public class SmartLobby {
 
     public void leaveLobby(ThreadHandler thread, JSONObject json) {
 	UserObject uo = getUserObject(thread.unique_identifier);
-	uo.finalize();
+	RoomObject ro = getRoomObject(uo);
+	ro.onUserLeave(uo, thread);
+	//uo.finalize();
     }
 
     public void login(ThreadHandler thread, JSONObject json) {
 
     }
     
-    public UserObject joinLobby(ThreadHandler thread, JSONObject json) {
+    public UserObject initUserObject(ThreadHandler thread, JSONObject json) {
 	JSONArray u = new JSONArray();
 	u.add(json.get("_username"));
 	u.add(nextUserId);

@@ -36,7 +36,7 @@ public class UserObject extends JSONObject  {
 	    _threadHandler = thread;	    
 
 	    JSONArray a = new JSONArray();
-	    a.add("onJoinLobby");
+	    a.add("onInitUserObject");
 	    a.add(this);
 
 	    _threadHandler.send(a);
