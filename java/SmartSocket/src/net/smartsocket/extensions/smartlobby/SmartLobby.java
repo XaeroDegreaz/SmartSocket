@@ -1,5 +1,6 @@
 package net.smartsocket.extensions.smartlobby;
 
+import java.lang.reflect.Method;
 import net.smartsocket.ThreadHandler;
 import org.json.simple.*;
 
@@ -7,16 +8,18 @@ import org.json.simple.*;
  *
  * @author XaeroDegreaz
  */
-public class SmartLobby {
+public abstract class SmartLobby {
 
     public static JSONObject userObjects = new JSONObject();
     public static int nextUserId = 0;
     public static JSONArray roomObjects = new JSONArray();
     public static int nextRoomId = 0;
+    public static SmartLobby instance;
 
     /**
      * Not used unless using SmartLobby only
      */
+    
     public void SmartLobby() {
 	System.out.println("I have been called..");
     }
@@ -125,10 +128,27 @@ public class SmartLobby {
     public void createRoom(ThreadHandler thread, JSONObject json) {
 	UserObject uo = getUserObject(thread.unique_identifier);
 	roomObjects.add(new RoomObject(uo, json));
-	
-	
+    }
+
+    //# Userd for internal purposes only.
+    public static void server_callback_createRoom(RoomObject room, JSONObject json){
+	Class[] args = new Class[2];
+	args[0] = RoomObject.class;
+	args[1] = JSONObject.class;
+
+	try {
+	    Method m = SmartLobby.class.getMethod("extension_callback_createRoom", args);
+	    
+	    Object[] parameters = {room, json};
+	    
+	    m.invoke(instance, parameters);
+	}catch(Exception e) {
+	    e.printStackTrace();
+	}
 
     }
+    
+    public abstract void extension_callback_createRoom(RoomObject room, JSONObject json);
 
     /**
      * Delete a room.

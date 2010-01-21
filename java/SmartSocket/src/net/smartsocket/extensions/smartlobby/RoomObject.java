@@ -34,6 +34,8 @@ public class RoomObject extends JSONObject {
 	this.put("Status", _status);
 	this.put("Creator", user._username);
 
+	SmartLobby.server_callback_createRoom(this, json);
+
 	//# Team Stuff
 	_teamList.put("unassigned", new JSONArray());
 	_teamList.put("red", new JSONArray());

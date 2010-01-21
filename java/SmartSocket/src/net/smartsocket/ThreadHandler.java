@@ -111,6 +111,8 @@ public class ThreadHandler extends Thread implements Runnable {
 			 */
 
 			//# Replace bad text...
+			line = Base64Coder.decodeString(line);
+			
 			line = line.replace("<", "&lt;");
 
 			Object jsonObj = JSONValue.parse(line);
@@ -169,7 +171,7 @@ public class ThreadHandler extends Thread implements Runnable {
 
 	try {
 	    //# We need to append a \r for SmartLobby on the client side.
-	    String toClient = data.toString() + "\r";
+	    String toClient = Base64Coder.encodeString(data.toString()) + "\r";
 	    //# Get the data being sent as bytes.
 	    byte[] bytes = toClient.getBytes("UTF-8");
 
