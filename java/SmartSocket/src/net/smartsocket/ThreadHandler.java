@@ -35,10 +35,10 @@ public class ThreadHandler extends Thread implements Runnable {
     public String unique_identifier = null;
     //public String unique_threadName = null;
     private BufferedReader in;
-    //public PrintWriter out;
+    public PrintWriter out;
     //# Byte testing...
     // private InputStream in;
-    public OutputStream out;
+    //public OutputStream out;
     byte nullByte = '\u0000';
     public Server _server;
     private OutputStream policy_out;
@@ -50,11 +50,11 @@ public class ThreadHandler extends Thread implements Runnable {
 
 	in = new BufferedReader(
 		new InputStreamReader(socket.getInputStream()));
-//	out = new PrintWriter(
-//		new OutputStreamWriter(socket.getOutputStream()));
+	out = new PrintWriter(
+		new OutputStreamWriter(socket.getOutputStream()));
 
 	//in = socket.getInputStream();
-	out = socket.getOutputStream();
+	//out = socket.getOutputStream();
 
 	policy_out = socket.getOutputStream();
 
@@ -111,8 +111,12 @@ public class ThreadHandler extends Thread implements Runnable {
 			 */
 
 			//# Replace bad text...
-			line = Base64Coder.decodeString(line);
-			
+			try {
+			    line = Base64Coder.decodeString(line);
+			}catch (Exception e) {
+			    Logger.log("ThreadHandler", "Invalid Base64 input detected.");
+			}
+
 			line = line.replace("<", "&lt;");
 
 			Object jsonObj = JSONValue.parse(line);
@@ -135,7 +139,28 @@ public class ThreadHandler extends Thread implements Runnable {
 
 		    } catch (Exception e) {
 			e.printStackTrace();
-			Logger.log("ThreadHandler", e.toString());
+			Logger.log("ThreadHandler", "Removing rogue thread... "+socket.getLocalAddress());
+			//# Destroy rogue thread immediately...
+			try {
+			    in.close();
+			    out.close();
+			    socket.close();
+			} catch (IOException ioe) {
+			    System.out.println("Closing streams seems to have failed: " + ioe);
+			} finally {
+			    synchronized (handlers) {
+				SmartLobby.onDisconnect(unique_identifier);
+				handlers.removeElement(this);
+			    }
+
+			    try {
+				finalize();
+			    } catch (Throwable ee) {
+				ee.printStackTrace();
+			    }
+
+			}
+			//##############
 		    }
 
 		}
@@ -149,7 +174,7 @@ public class ThreadHandler extends Thread implements Runnable {
 		out.close();
 		socket.close();
 	    } catch (IOException ioe) {
-		System.out.println("Closing streams seems to have failed: "+ioe);
+		System.out.println("Closing streams seems to have failed: " + ioe);
 	    } finally {
 		synchronized (handlers) {
 		    SmartLobby.onDisconnect(unique_identifier);
@@ -158,7 +183,7 @@ public class ThreadHandler extends Thread implements Runnable {
 
 		try {
 		    finalize();
-		}catch(Throwable e) {
+		} catch (Throwable e) {
 		    e.printStackTrace();
 		}
 
@@ -175,7 +200,7 @@ public class ThreadHandler extends Thread implements Runnable {
 	    //# Get the data being sent as bytes.
 	    byte[] bytes = toClient.getBytes("UTF-8");
 
-	    out.write(bytes);
+	    out.print(toClient);
 	    out.flush();
 	    System.out.println("SENT: " + data.toString());
 	} catch (Exception e) {

@@ -38,9 +38,14 @@ public abstract class SmartLobby {
      * @param thread
      */
     public static void onDisconnect(String unique_identifier) {
-	if(!unique_identifier.equals("<policy-file-request/>")) {
-	    UserObject uo = (UserObject)userObjects.get(unique_identifier);
-	    uo.finalize();
+	if(!unique_identifier.equals("<policy-file-request/>") && !unique_identifier.equals(null)) {
+
+	    try {
+		UserObject uo = (UserObject)userObjects.get(unique_identifier);
+		uo.finalize();
+	    }catch(Exception e){
+		System.out.println("No corresponding user object to finalize.");
+	    }
 	}
     }
 
@@ -210,7 +215,7 @@ public abstract class SmartLobby {
 
     }
     
-    public UserObject initUserObject(ThreadHandler thread, JSONObject json) {
+    public synchronized UserObject initUserObject(ThreadHandler thread, JSONObject json) {
 	JSONArray u = new JSONArray();
 	u.add(json.get("_username"));
 	u.add(nextUserId);

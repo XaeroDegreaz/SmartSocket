@@ -70,9 +70,16 @@ public class RoomObject extends JSONObject {
 	a.add("onUserList");
 
 	JSONArray userList = new JSONArray();
+	JSONObject o = new JSONObject();
 
 	for (int i = 0; i < _userList.size(); i++) {
-	    userList.add(_userList.get(i));
+	    UserObject u = (UserObject)_userList.get(i);
+
+	    o = new JSONObject();
+	    o.put("Username", u._username);
+	    o.put("uid", u.get("uid"));
+
+	    userList.add(o);
 	}
 	//System.out.println(a);
 	a.add(userList);
