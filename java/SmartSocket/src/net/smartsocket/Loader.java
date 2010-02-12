@@ -68,7 +68,7 @@ public class Loader {
 		    //# Compile helper classes
 		    JSONArray helpers = (JSONArray)e.get("helpers");
 
-		    if(helpers.size() > 0) {
+		    if(helpers != null && helpers.size() > 0) {
 
 			for (int j = 0; j < helpers.size(); j++) {
 			    f = new String[]{"./" + _constants.get("EXTENSION_DIR") + "/" + e.get("name") + "/" + helpers.get(j) + ".java"};
