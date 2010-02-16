@@ -77,8 +77,6 @@
            <zipfileset src="dist/lib/appframework-1.0.3.jar" excludes="META-INF/*" />
            <zipfileset src="dist/lib/swing-worker-1.1.jar" excludes="META-INF/*" />
 	   <zipfileset src="dist/lib/json_simple-1.1.jar" excludes="META-INF/*" />
-	   <zipfileset src="dist/lib/tools.jar" excludes="META-INF/*" />
-	   <zipfileset src="dist/lib/mysql-connector-java-5.1.11-bin.jar" excludes="META-INF/*" />
 
             <manifest>
                 <attribute name="Main-Class" value="net.smartsocket.Main"/>
