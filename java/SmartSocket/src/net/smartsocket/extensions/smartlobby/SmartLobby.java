@@ -1,6 +1,7 @@
 package net.smartsocket.extensions.smartlobby;
 
 import java.lang.reflect.Method;
+import net.smartsocket.Server;
 import net.smartsocket.ThreadHandler;
 import org.json.simple.*;
 
@@ -142,18 +143,18 @@ public abstract class SmartLobby {
 	args[1] = JSONObject.class;
 
 	try {
-	    Method m = SmartLobby.class.getMethod("extension_callback_createRoom", args);
-	    
+	    Method m = Server.extension.getMethod("extension_callback_createRoom", args);
+
 	    Object[] parameters = {room, json};
 	    
-	    m.invoke(instance, parameters);
+	    m.invoke(Server.extensionInstance, parameters);
+
 	}catch(Exception e) {
+            System.out.println("ERROR HERE?!?!");
 	    e.printStackTrace();
 	}
 
     }
-    
-    public abstract void extension_callback_createRoom(RoomObject room, JSONObject json);
 
     /**
      * Delete a room.

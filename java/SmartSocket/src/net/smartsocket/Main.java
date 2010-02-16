@@ -47,8 +47,8 @@ public class Main extends SingleFrameApplication {
     /**
      * Main method launching the application.
      */
-    public static void main(String[] args) {
-	launch(Main.class, args);
+    public static void main(Class extension, int port) {
+	launch(Main.class, null);
 	while (MainView.consoleLog == null) {
 	    //# Here we are waiting for the console to initialize so we can use it.
 	}
@@ -58,12 +58,10 @@ public class Main extends SingleFrameApplication {
 	_loader = new Loader();
 
 	try {
-	    for (int i = 0; i < _loader._extensions.size(); i++) {
-		JSONObject e = (JSONObject)_loader._extensions.get(i);
-		Logger.log("Main", "Starting " + e.get("name") + " extension on port "  +e.get("port"));
-		Server server = new Server(e, Integer.parseInt(e.get("port").toString()));
+		Logger.log("Main", "Starting " + extension.getName() + " extension on port "  +port);
+		Server server = new Server(extension, port);
 		new Thread(server).start();
-	    }
+	    
 	} catch (Exception e) {
 	    Logger.log("Main", e.toString());
 	}

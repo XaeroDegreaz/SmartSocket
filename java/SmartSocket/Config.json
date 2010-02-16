@@ -4,26 +4,11 @@
 	    "name" : "DATA_PROTOCOL",
 	    "value" : "json"
 	},
-	
-	{
-	    "name" : "EXTENSION_DIR",
-	    "value" : "extensions" 
-	},
 
 	{
 	    
 	    "name" : "USE_ZLIB",
 	    "value" : false
 	}
-    ],
-
-    "extensions":[
-
-	{
-	    "name" : "Example",
-	    "port" : 8888,
-	    "enabled" : true
-	},
-
     ]
 }

@@ -61,11 +61,11 @@ public class ThreadHandler extends Thread implements Runnable {
 	try {
 	    Class[] args = new Class[1];
 	    args[0] = ThreadHandler.class;
-	    Method m = _server._extension.getMethod("onConnect", args);
-	    m.invoke(_server._extensionInstance, this);
+	    Method m = Server.extension.getMethod("onConnect", args);
+	    m.invoke(Server.extensionInstance, this);
 	} catch (Exception e) {
 	    e.printStackTrace();
-	    Logger.log(_server.extension.get("name").toString(), "This extension does not have an onConnect method!");
+	    Logger.log(Server.extension.getName(), "This extension does not have an onConnect method!");
 	}
 
     }
@@ -131,11 +131,11 @@ public class ThreadHandler extends Thread implements Runnable {
 			Class[] args = new Class[2];
 			args[0] = ThreadHandler.class;
 			args[1] = JSONObject.class;
-			Method m = _server._extension.getMethod(method, args);
+			Method m = _server.extension.getMethod(method, args);
 
 			//# Here we finally invoke the method on our extension with the data collected from above.
 			Object params[] = {this, parameters};
-			m.invoke(_server._extensionInstance, params);
+			m.invoke(_server.extensionInstance, params);
 
 		    } catch (Exception e) {
 			e.printStackTrace();

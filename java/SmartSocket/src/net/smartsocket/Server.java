@@ -13,23 +13,19 @@ public class Server implements Runnable {
     protected ServerSocket serverSocket = null;
     protected boolean isStopped = false;
     protected Thread runningThread = null;
-    public JSONObject extension;
-    public Class _extension;
-    public Object _extensionInstance;
+  
+    public static Class extension;
+    public static Object extensionInstance;
+    
     public static Connection conn = null;
 
-    public Server(JSONObject extension, int port) {
+    public Server(Class extension, int port) {
 	this.serverPort = port;
 	this.extension = extension;
 	
 	try {
-	   Class c;
-	    ClassLoader cl = Server.class.getClassLoader();
-	    
-	    c = cl.loadClass(extension.get("name").toString() + "." + extension.get("name").toString());
-
-	    this._extensionInstance = c.newInstance();
-	    this._extension = _extensionInstance.getClass();
+	   
+	    this.extensionInstance = extension.newInstance();
 
 	} catch (Exception e) {
 	    e.printStackTrace();
