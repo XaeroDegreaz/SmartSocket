@@ -3,9 +3,6 @@ package net.smartsocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.sql.Connection;
-import org.json.simple.JSONObject;
 
 public class Server implements Runnable {
 
@@ -16,8 +13,6 @@ public class Server implements Runnable {
   
     public static Class extension;
     public static Object extensionInstance;
-    
-    public static Connection conn = null;
 
     public Server(Class extension, int port) {
 	this.serverPort = port;

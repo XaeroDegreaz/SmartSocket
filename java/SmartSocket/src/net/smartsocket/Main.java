@@ -5,7 +5,6 @@ package net.smartsocket;
 
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
-import org.json.simple.JSONObject;
 
 
 /**

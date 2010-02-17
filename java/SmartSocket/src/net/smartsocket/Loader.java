@@ -15,7 +15,7 @@ import org.json.simple.JSONValue;
 public class Loader {
 
     JSONObject _config = null;
-    JSONObject _constants = new JSONObject();
+    public static JSONObject _constants = new JSONObject();
     JSONArray _extensions = new JSONArray();
 
     public Loader() {

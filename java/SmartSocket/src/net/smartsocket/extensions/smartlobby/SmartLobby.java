@@ -231,12 +231,12 @@ public abstract class SmartLobby {
     }
 
 
-    public UserObject getUserObject(String unique_identifier) {
+    public static UserObject getUserObject(String unique_identifier) {
 	UserObject uo = (UserObject)userObjects.get(unique_identifier);
 	return uo;
     }
 
-    public RoomObject getRoomObject(UserObject uo) {
+    public static RoomObject getRoomObject(UserObject uo) {
 	RoomObject ro = uo._roomObject;
 	return ro;
     }
