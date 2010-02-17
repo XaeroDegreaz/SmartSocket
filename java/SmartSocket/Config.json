@@ -7,7 +7,7 @@
 
 	{
 	    
-	    "name" : "USE_ZLIB",
+	    "name" : "USE_BASE64",
 	    "value" : false
 	}
     ]
