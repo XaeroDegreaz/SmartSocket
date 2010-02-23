@@ -54,7 +54,8 @@ public class Main extends SingleFrameApplication {
 	Logger.log("Main", "This Java application is not meant to be launched by itself.\n" +
 		"You must first place the SmartSocket.jar in your class path and then\n" +
 		"call the main method of SmartSocket like so:\n" +
-		"net.smartsocket.Main.main(YourClassFile.class, desiredPortNumber);");
+		"net.smartsocket.Main.main(YourClassFile.class, desiredPortNumber);\n\n" +
+		"Visit http://code.google.com/p/smartsocket/wiki/YourFirstExtension for an example.");
     }
     public static void main(Class extension, int port) {
 	launch(Main.class, null);
