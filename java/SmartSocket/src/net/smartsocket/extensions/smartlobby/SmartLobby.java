@@ -240,5 +240,17 @@ public abstract class SmartLobby {
 	RoomObject ro = uo._roomObject;
 	return ro;
     }
+
+    public static void brodcastToRoom(RoomObject room, JSONArray json) {
+	//# Send to all users in the room.
+	for (int i = 0; i < room._threads.size(); i++) {
+	    synchronized (room._threads) {
+
+		ThreadHandler handler =
+			(ThreadHandler) room._threads.elementAt(i);
+		handler.send(json);
+	    }
+	}
+    }
     
 }
