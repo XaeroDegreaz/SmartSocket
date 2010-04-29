@@ -14,10 +14,14 @@ import org.json.simple.JSONObject;
  */
 public class ClientCall extends JSONArray{
     
-    JSONObject properties = new JSONObject();
+    private JSONObject properties = new JSONObject();
 
     public ClientCall(String method) {
 	add(method);
 	add(properties);
+    }
+
+    public void put(Object key, Object value) {
+	properties.put(key, value);
     }
 }
