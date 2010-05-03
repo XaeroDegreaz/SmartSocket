@@ -15,15 +15,38 @@ import org.json.simple.JSONObject;
  */
 public class RoomObject extends JSONObject {
 
+    /**
+     * A JSONArray of UserObject objects in this room.
+     */
     public JSONArray _userList = new JSONArray();
+    /**
+     * A vector containing ThreadHandler objects inside this room.
+     */
     public Vector _threads = new Vector(16);
+    /**
+     * Current number of users in the room
+     */
     public int _currentUsers = 0;
+    /**
+     * Room unique ID number
+     */
     public int _id = 0;
+    /**
+     * The status of the room. This will reflect the state of the room in a future relase.
+     */
     public String _status = "Waiting";
 
-    //# Team specifit arrays
+    //# Team specific arrays
+    /**
+     * The teamlist JSONOvject is a generic object for you to create your own teams in, for games and such.
+     */
     public JSONObject _teamList = new JSONObject();
 
+    /**
+     * Creates a new room object
+     * @param user a UserObject object of the creator of this room.
+     * @param json a JSONObject containing the properties of this room.
+     */
     public RoomObject(UserObject user, JSONObject json) {
 	_id = SmartLobby.nextRoomId;
 	this.put("ID", _id);
@@ -65,6 +88,10 @@ public class RoomObject extends JSONObject {
 	}
     }
 
+    /**
+     * Returns a list of users to the requesting client.
+     * @param thread a ThreadHandler object of the requesting client.
+     */
     public synchronized void getUserList(ThreadHandler thread) {
 	JSONArray a = new JSONArray();
 	a.add("onUserList");
@@ -86,6 +113,11 @@ public class RoomObject extends JSONObject {
 	thread.send(a);
     }
 
+    /**
+     * Fired when a new user joins the room.
+     * @param uo a UserObject of the user joining.
+     * @param thread a ThreadHandler object of the user joining.
+     */
     public synchronized void newUser(UserObject uo, ThreadHandler thread) {
 	uo._team = "unassigned";
 	
@@ -131,6 +163,11 @@ public class RoomObject extends JSONObject {
 	thread.send(a);
     }
 
+    /**
+     * Fires when a user leaves this room.
+     * @param user The departing user's UserObject
+     * @param thread The departing user's ThreadHandler
+     */
     public void onUserLeave(UserObject user, ThreadHandler thread) {
 	_userList.remove(user);
 	_threads.removeElement(thread);
@@ -159,6 +196,11 @@ public class RoomObject extends JSONObject {
 
     }
 
+    /**
+     * Sends a chat message to the room.
+     * @param user The UserObject of The message sender
+     * @param json The JSONObject containing message properties.
+     */
     public void sendRoom(UserObject user, JSONObject json) {
 	JSONArray a = new JSONArray();
 	a.add("onMessageRoom");
@@ -179,6 +221,9 @@ public class RoomObject extends JSONObject {
 	}
     }
 
+    /**
+     * Fired when the number of users changes in this room.
+     */
     public synchronized void onRoomCountUpdate() {
 	//# Check to see if the room now has 0 users. If so, delete the roo.
 	if(_threads.size() < 1 && _id != 0) {

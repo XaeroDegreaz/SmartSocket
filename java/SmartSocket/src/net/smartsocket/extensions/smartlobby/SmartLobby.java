@@ -11,11 +11,22 @@ import org.json.simple.*;
  */
 public abstract class SmartLobby {
 
+    /**
+     * The Master list of UserObject objects
+     */
     public static JSONObject userObjects = new JSONObject();
+    /**
+     * An incremented value reflecting the next unique user identifier for SmartLobby only
+     */
     public static int nextUserId = 0;
+    /**
+     * The master list of RoomObject objects
+     */
     public static JSONArray roomObjects = new JSONArray();
+    /**
+     * An incremented value reflecting the next unique room identifier for SmartLobby only
+     */
     public static int nextRoomId = 0;
-    public static SmartLobby instance;
 
     /**
      * Not used unless using SmartLobby only
@@ -36,7 +47,7 @@ public abstract class SmartLobby {
 
     /**
      * Actions to perform when a client disconnects.
-     * @param thread
+     * @param unique_identifier
      */
     public static void onDisconnect(String unique_identifier) {
 	if(!unique_identifier.equals("<policy-file-request/>") && !unique_identifier.equals(null)) {
@@ -137,6 +148,11 @@ public abstract class SmartLobby {
     }
 
     //# Userd for internal purposes only.
+    /**
+     *
+     * @param room
+     * @param json
+     */
     public static void server_callback_createRoom(RoomObject room, JSONObject json){
 	Class[] args = new Class[2];
 	args[0] = RoomObject.class;
@@ -205,6 +221,11 @@ public abstract class SmartLobby {
 	joinRoom(thread, o);
     }
 
+    /**
+     *
+     * @param thread
+     * @param json
+     */
     public void leaveLobby(ThreadHandler thread, JSONObject json) {
 	UserObject uo = getUserObject(thread.unique_identifier);
 	RoomObject ro = getRoomObject(uo);
@@ -212,10 +233,21 @@ public abstract class SmartLobby {
 	//uo.finalize();
     }
 
+    /**
+     *
+     * @param thread
+     * @param json
+     */
     public void login(ThreadHandler thread, JSONObject json) {
 
     }
     
+    /**
+     *
+     * @param thread
+     * @param json
+     * @return
+     */
     public synchronized UserObject initUserObject(ThreadHandler thread, JSONObject json) {
 	JSONArray u = new JSONArray();
 	u.add(json.get("_username"));
@@ -231,16 +263,31 @@ public abstract class SmartLobby {
     }
 
 
+    /**
+     * Retrieve the UserObject of a client
+     * @param unique_identifier The unique identifier assigned by you to the client at login.
+     * @return
+     */
     public static UserObject getUserObject(String unique_identifier) {
 	UserObject uo = (UserObject)userObjects.get(unique_identifier);
 	return uo;
     }
 
+    /**
+     * Retrieve the RoomObject of a client
+     * @param uo The UserObject of the client
+     * @return
+     */
     public static RoomObject getRoomObject(UserObject uo) {
 	RoomObject ro = uo._roomObject;
 	return ro;
     }
 
+    /**
+     * Sends a packet to target room
+     * @param room The RoomObject of the room
+     * @param json The JSONArray or ClientCall packet to be sent.
+     */
     public static void brodcastToRoom(RoomObject room, JSONArray json) {
 	//# Send to all users in the room.
 	for (int i = 0; i < room._threads.size(); i++) {
