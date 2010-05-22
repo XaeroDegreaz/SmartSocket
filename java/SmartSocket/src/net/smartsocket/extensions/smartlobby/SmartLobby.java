@@ -166,8 +166,7 @@ public abstract class SmartLobby {
 	    m.invoke(Server.extensionInstance, parameters);
 
 	}catch(Exception e) {
-            System.out.println("ERROR HERE?!?!");
-	    e.printStackTrace();
+            
 	}
 
     }

@@ -12,11 +12,9 @@ import org.jdesktop.application.SingleFrameApplication;
  */
 public class Main extends SingleFrameApplication {
 
-    public static EventHandler _eventHandler;
     public static Loader _loader;
     public static Server _server;
     public static ThreadHandler _threadHandler;
-    private static Main me;
 
     /**
      * At startup create and show the main frame of the application.
