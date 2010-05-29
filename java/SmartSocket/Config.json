@@ -1,14 +1,16 @@
 { 
     "constants":[
-	{	    
-	    "name" : "DATA_PROTOCOL",
-	    "value" : "json"
-	},
-
-	{
-	    
-	    "name" : "USE_BASE64",
-	    "value" : false
-	}
+        {
+            "name" : "DATA_PROTOCOL",
+            "value" : "json"
+        },
+        {
+            "name" : "USE_ZLIB",
+            "value" : false
+        },
+        {
+            "name" : "SEND_POLICY_FILE",
+            "value" : false
+        }
     ]
 }
