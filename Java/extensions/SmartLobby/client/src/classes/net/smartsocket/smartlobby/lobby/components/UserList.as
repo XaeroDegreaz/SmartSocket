@@ -36,7 +36,7 @@ package net.smartsocket.smartlobby.lobby.components
 			
 			SmartLobby.lobby.pm.visible = true;
 			var o:Object = {Target:_list.selectedItem.label, uid:_list.selectedItem.data};
-			SmartLobby.lobby.pm.startPM(o);
+			SmartLobby.lobby.pm.startNewMessage(o);
 		}
 
 	}

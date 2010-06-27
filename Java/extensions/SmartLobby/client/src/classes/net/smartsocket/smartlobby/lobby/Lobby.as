@@ -35,18 +35,17 @@ package net.smartsocket.smartlobby.lobby
 		public var options;
 		
 		public var pm:PrivateMessages;
+		public var customGameListColumns:Array;
+		public var customGameListWidths:Array;
 		
-		public function Lobby()
+		public function Lobby($customGameListColumns:Array = null, $customGameListWidths:Array = null)
 		{
 			
-			
+			customGameListWidths = $customGameListWidths;
+			customGameListColumns = $customGameListColumns;
 			SmartLobby.lobby = this;
 			
 			trace("Lobby has been initialized.");
-			
-			if(SmartLobby.customListeners["home"]) {
-				GameLoader.self.removeChild(SmartLobby.customListeners["home"]);
-			}
 						
 			pm = new PrivateMessages();
 			pm.tab.addEventListener(MouseEvent.MOUSE_DOWN, pm.startDragListener);
@@ -174,7 +173,7 @@ package net.smartsocket.smartlobby.lobby
 			
 			SmartLobby.my.room = room.ID;
 			try {
-				GameLoader.alert.animate_out();
+				SmartLobby.customListeners["root"].alert.animate_out();
 				
 			}catch(e) {
 				
@@ -299,7 +298,7 @@ package net.smartsocket.smartlobby.lobby
 		public function onMessagePrivate(e:SmartLobbyEvent):void {
 			var message:Object = e.data;
 			pm.visible = true;
-			pm.newMessage(message);
+			pm.receiveMessage(message);
 		}
 		
 		public function onTeamList(e:SmartLobbyEvent):void {
