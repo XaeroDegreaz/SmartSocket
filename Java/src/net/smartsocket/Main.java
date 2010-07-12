@@ -3,6 +3,7 @@
  */
 package net.smartsocket;
 
+import net.smartsocket.updatemanager.UpdateManager;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
 
@@ -60,6 +61,17 @@ public class Main extends SingleFrameApplication {
 	while (MainView.consoleLog == null) {
 	    //# Here we are waiting for the console to initialize so we can use it.
 	}
+
+	UpdateManager updateManager = new UpdateManager(false);
+
+	if(updateManager.updateAvailable) {
+	    //# Ask to update SmartSOcket.jar
+	    //# if yes
+	    //# update
+	    //# if no
+	    //# continue
+	}
+
 	Logger.log("Main", "Initializing configuration...");
 
 	//# Load the configuration file

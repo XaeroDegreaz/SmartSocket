@@ -93,6 +93,7 @@ package net.smartsocket.smartlobby.lobby.components
 		
 		private function removeMe() {
 			try {
+				trace("Trying to removeMe");
 				parent.removeChild(this);
 				trace("Alert removed");
 			}catch(e) {

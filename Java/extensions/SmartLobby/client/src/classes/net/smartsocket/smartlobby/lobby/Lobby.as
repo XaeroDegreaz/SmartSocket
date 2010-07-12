@@ -160,6 +160,14 @@ package net.smartsocket.smartlobby.lobby
 		public function onCreateRoom(e:SmartLobbyEvent):void {
 			var room:Object = e.data;
 			SmartLobby.my.createdRoom = room._id;
+			
+			//# TODO Figure out why this isn't working anymore....
+//			try {
+//				SmartLobby.customListeners["root"].alert.animate_out();				
+//			}catch(e) {
+//				trace(e);
+//			}
+			
 			SmartLobby.customListeners["server"].joinRoom(room._id);
 		}
 		
@@ -172,12 +180,6 @@ package net.smartsocket.smartlobby.lobby
 			var room:Object = e.data;
 			
 			SmartLobby.my.room = room.ID;
-			try {
-				SmartLobby.customListeners["root"].alert.animate_out();
-				
-			}catch(e) {
-				
-			}
 			SmartLobby.customListeners["server"].getUserList();
 			
 			if(room.ID != 0) {
