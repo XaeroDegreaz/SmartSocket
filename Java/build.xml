@@ -83,5 +83,12 @@
 		<!--<attribute name="Class-Path" value="./extensions/"/>-->
             </manifest>
         </jar>
+
+	<exec dir="./" executable="java">
+	    <arg value="-classpath"/>
+	    <arg value="SmartSocket.jar"/>
+	    <arg value="net.smartsocket.updatemanager.ChecksumManager"/>
+	</exec>
+
     </target>
 </project>
