@@ -23,7 +23,7 @@ public class UpdateManager {
 	    InputStream input = remoteChecksum.openStream();
 	    reader = new BufferedReader( new InputStreamReader(input) );
 
-	    String checksum = reader.readLine();
+	    String checksum = reader.readLine().trim();
 
 	    if( ChecksumManager.getMD5Checksum("SmartSocket.jar").equals(checksum) ) {
 		System.out.println("Versions are different.");
