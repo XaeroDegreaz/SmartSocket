@@ -19,7 +19,7 @@ public class UpdateManager {
 	BufferedReader reader = null;
 	
 	try {
-	    remoteChecksum = new URL("http://github.com/XaeroDegreaz/SmartSocket/raw/master/Java/Update Checksum.md5");
+	    remoteChecksum = new URL("http://github.com/XaeroDegreaz/SmartSocket/raw/master/Java/Update%20Checksum.md5");
 	    InputStream input = remoteChecksum.openStream();
 	    reader = new BufferedReader( new InputStreamReader(input) );
 
