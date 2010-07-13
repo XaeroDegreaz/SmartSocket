@@ -90,5 +90,19 @@
 	    <arg value="net.smartsocket.updatemanager.ChecksumManager"/>
 	</exec>
 
+	<jar jarfile="SmartSocket.jar">
+	    <zipfileset src="${dist.jar}" excludes="META-INF/*" />
+	    <zipfileset src="dist/lib/appframework-1.0.3.jar" excludes="META-INF/*" />
+	    <zipfileset src="dist/lib/swing-worker-1.1.jar" excludes="META-INF/*" />
+	    <zipfileset src="dist/lib/json_simple-1.1.jar" excludes="META-INF/*" />
+	    <zipfileset file="./Update Checksum.md5" fullpath="net/smartsocket/resources/Update Checksum.md5"/>
+	    
+            <manifest>
+                <attribute name="Main-Class" value="net.smartsocket.Main"/>
+		<!--<attribute name="Class-Path" value="./extensions/"/>-->
+            </manifest>
+	    
+	</jar>
+
     </target>
 </project>

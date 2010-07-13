@@ -3,10 +3,11 @@
  */
 package net.smartsocket;
 
+import java.net.*;
+import java.io.*;
 import net.smartsocket.updatemanager.UpdateManager;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
-
 
 /**
  * The main class of the application.
@@ -50,42 +51,32 @@ public class Main extends SingleFrameApplication {
 	while (MainView.consoleLog == null) {
 	    //# Here we are waiting for the console to initialize so we can use it.
 	}
-	Logger.log("Main", "This Java application is not meant to be launched by itself.\n" +
-		"You must first place the SmartSocket.jar in your class path and then\n" +
-		"call the main method of SmartSocket like so:\n" +
-		"net.smartsocket.Main.main(YourClassFile.class, desiredPortNumber);\n\n" +
-		"Visit http://code.google.com/p/smartsocket/wiki/YourFirstExtension for an example.");
+	Logger.log("Main", "This Java application is not meant to be launched by itself.\n"
+		+ "You must first place the SmartSocket.jar in your class path and then\n"
+		+ "call the main method of SmartSocket like so:\n"
+		+ "net.smartsocket.Main.main(YourClassFile.class, desiredPortNumber);\n\n"
+		+ "Visit http://code.google.com/p/smartsocket/wiki/YourFirstExtension for an example.");
     }
+
     public static void main(Class extension, int port) {
 	launch(Main.class, null);
 	while (MainView.consoleLog == null) {
 	    //# Here we are waiting for the console to initialize so we can use it.
 	}
-
-	UpdateManager updateManager = new UpdateManager(false);
-
-	if(updateManager.updateAvailable) {
-	    //# Ask to update SmartSOcket.jar
-	    //# if yes
-	    //# update
-	    //# if no
-	    //# continue
-	}
-
+	//# Launch the update manager to try and get some updates for SmartSocket.
+	UpdateManager updateManager = new UpdateManager(true);
 	Logger.log("Main", "Initializing configuration...");
 
 	//# Load the configuration file
 	_loader = new Loader();
 
 	try {
-		Logger.log("Main", "Starting " + extension.getName() + " extension on port "  +port);
-		Server server = new Server(extension, port);
-		new Thread(server).start();
-	    
+	    Logger.log("Main", "Starting " + extension.getName() + " extension on port " + port);
+	    Server server = new Server(extension, port);
+	    new Thread(server).start();
+
 	} catch (Exception e) {
 	    Logger.log("Main", e.toString());
 	}
-
-
     }
 }
