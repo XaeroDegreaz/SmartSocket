@@ -84,7 +84,7 @@ package net.smartsocket.smartlobby.lobby
 		
 		
 		
-		private function init(e:Event) {			
+		public function init(e:Event) {			
 			SmartLobby.customListeners["server"].joinRoom(0);
 		}
 		
@@ -266,16 +266,20 @@ package net.smartsocket.smartlobby.lobby
 		 */
 		public function onRoomCountUpdate(e:SmartLobbyEvent):void {
 			var room:Object = e.data;
-			for(var i:Number = 0; i < gl.listType._list.dataProvider.length; i++) {
-				var curr:Object = gl.listType._list.dataProvider.getItemAt(i);
-				
-				if(Number(curr.ID) == Number(room.ID)) {
-					trace("THIS IS THE CORRECT ROOM TO UPDATE. Room Stuff: "+[curr.Current,room.Current]);
-					curr.Current = room.Current;
-					trace(curr.Current);
-					gl.listType._list.dataProvider.invalidateItem(curr);
-					break;
+			try {
+				for(var i:Number = 0; i < gl.listType._list.dataProvider.length; i++) {
+					var curr:Object = gl.listType._list.dataProvider.getItemAt(i);
+					
+					if(Number(curr.ID) == Number(room.ID)) {
+						trace("THIS IS THE CORRECT ROOM TO UPDATE. Room Stuff: "+[curr.Current,room.Current]);
+						curr.Current = room.Current;
+						trace(curr.Current);
+						gl.listType._list.dataProvider.invalidateItem(curr);
+						break;
+					}
 				}
+			}catch(e:Error) {
+				
 			}
 		}
 		

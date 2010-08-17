@@ -24,8 +24,9 @@ package net.smartsocket.smartlobby.lobby.components
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
 	
-	import net.smartsocket.smartlobby.tools.*;
+	import net.smartsocket.protocols.json.ServerCall;
 	import net.smartsocket.smartlobby.SmartLobby;
+	import net.smartsocket.smartlobby.tools.*;
 	
 	public class GameList extends MovieClip
 	{
@@ -115,8 +116,7 @@ package net.smartsocket.smartlobby.lobby.components
 			SmartLobby.customListeners["server"].ready();
 		}
 		public function leave(e:MouseEvent) {
-			var o:Object = ["leaveGameRoom",{}]
-			SmartLobby.customListeners["server"].send(o);
+			SmartLobby.customListeners["server"].send( new ServerCall("leaveGameRoom") );
 			SmartLobby.customListeners["server"].leaveRoom();
 			SmartLobby.my.team = null;
 		}
@@ -124,8 +124,7 @@ package net.smartsocket.smartlobby.lobby.components
 			//Globals.server.gameOptions();
 		}
 		public function start(e:MouseEvent) {
-			var o:Object = ["startGame",{}];
-			SmartLobby.customListeners["server"].send(o);
+			SmartLobby.customListeners["server"].send( new ServerCall("startGame") );
 		}
 		public function kick(e:MouseEvent) {
 			//Globals.server.kick();

@@ -27,6 +27,7 @@ package net.smartsocket {
 	import flash.net.Socket;
 	import flash.utils.ByteArray;
 	
+	import net.smartsocket.protocols.json.ServerCall;
 	import net.smartsocket.smartlobby.lobby.Lobby;
 	
 	public class SmartSocketClient extends Socket{
@@ -41,12 +42,16 @@ package net.smartsocket {
 		public static var customListeners:Array = new Array();
 		
 		public static var useZlib:Boolean = false;
+		protected static var trasnferQueueDelay:int = 100;
+		private var transferQueue:TransferQueue;
 		
 		public function SmartSocketClient() {
 			addEventListener(ProgressEvent.SOCKET_DATA, this.onJSON);
 			addEventListener(Event.CONNECT, this.onConnect);
 			addEventListener(Event.CLOSE, this.onDisconnect);
 			addEventListener(IOErrorEvent.IO_ERROR, this.onError);
+			
+			transferQueue = new TransferQueue(this, trasnferQueueDelay);
 		}		
 		
 		protected function onJSON(event:ProgressEvent):void {			
@@ -106,7 +111,14 @@ package net.smartsocket {
 		}
 		
 		
-		public function send(data:Object):Boolean {
+		public function send(data:ServerCall, immediately:Boolean = false):Boolean {
+			//# If this isn't an immediate send, we need to send this to our transfer queue in order to keep it from smashing with other sends.
+			//# if it's not immediate and there are no other servercalls in the queue, we treat this as an immediate send by bypassing the queue.
+			if(!immediately) {
+				transferQueue.add(data);
+				return true;
+			}
+			
 			//# Encode our client call to JSON
 			var json:String = JSON.encode(data);
 			

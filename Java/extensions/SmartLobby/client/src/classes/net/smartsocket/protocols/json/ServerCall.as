@@ -30,8 +30,9 @@ package net.smartsocket.protocols.json
 			
 		}
 		
-		public function put(key:Object, value:Object):void {
+		public function put(key:Object, value:Object):ServerCall {
 			properties[key] = value;
+			return this;
 		}
 	}
 }

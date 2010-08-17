@@ -28,6 +28,7 @@ package net.smartsocket.smartlobby {
 	import flash.utils.ByteArray;
 	
 	import net.smartsocket.SmartSocketClient;
+	import net.smartsocket.protocols.json.ServerCall;
 	import net.smartsocket.smartlobby.events.*;
 	import net.smartsocket.smartlobby.lobby.Lobby;
 	import net.smartsocket.smartlobby.tools.*;
@@ -119,60 +120,67 @@ package net.smartsocket.smartlobby {
 		
 		//# SmartLobby core functions.
 		public function login(details:Object):void {
-			var o:Object = ["login", details];				
-			send(o);
+			var call:ServerCall = new ServerCall("login");
+			
+			//# Loop through the details of the login and add them to the login call.			
+			for(var i in details) {
+				call.put(i, details[i]);
+			}
+							
+			send(call);
 		}
 		
 		public function joinLobby():void {
-			var o:Object = ["joinLobby",{}];
-			send(o);
+			send( new ServerCall("joinLobby") );
 		}
 		
 		public function leaveLobby():void {
-			var o:Object = ["leaveLobby",{}];
-			send(o);
+			send( new ServerCall("leaveLobby") );
 		}
 		
 		public function joinRoom(room:Number):void {
-			var o:Object = ["joinRoom",{
-				"_id" : room
-			}];
-			send(o);
+			send(
+				new ServerCall("joinRoom")
+				.put("_id", room)
+			);
 		}
 		
 		public function getUserList():void {
-			var o:Object = ["getUserList",{}];
-			send(o);
+			send( new ServerCall("getUserList") );
 		}
 		
 		public function getRoomList():void {
-			var o:Object = ["getRoomList",{}];
-			send(o);
+			send( new ServerCall("getRoomList") );
 		}
 		
 		public function createRoom(details:Object):void {
-			var o:Object = ["createRoom", details];			
-			send(o);
+			var call:ServerCall = new ServerCall("createRoom");
+			
+			//# Loop through the details of the login and add them to the login call.			
+			for(var i in details) {
+				call.put(i, details[i]);
+			}
+			
+			send(call);
 		}
 		
 		public function leaveRoom():void {
-			var o:Object = ["leaveRoom",{}];			
-			send(o);			
+			send( new ServerCall("leaveRoom") );
 		}
 		
 		public function sendRoom(message:String):void {
-			var o:Object = ["sendRoom",{
-				"_message" : message
-			}];				
-			send(o);
+			send(
+				new ServerCall("sendRoom")
+				.put("_message", message)
+			);
 		}
 		
 		public function sendPrivate(target:String, message:String):void {
-			var o:Object = ["sendPrivate",{
-				"_message" : message,
-				"_target" : target
-			}];				
-			send(o);
+			send(
+				new ServerCall("sendPrivate")
+				.put("_message", message)
+				.put("_target", target)
+			);
 		}		
 	}
 }
