@@ -1,4 +1,4 @@
-/*
+﻿/*
 Version: MPL 1.1/LGPL 2.1/GPL 2.0
 
 The contents of this file are subject to the Mozilla Public License Version 
@@ -26,6 +26,7 @@ package net.smartsocket.smartlobby.lobby.components
 	
 	import net.smartsocket.protocols.json.ServerCall;
 	import net.smartsocket.smartlobby.SmartLobby;
+	import net.smartsocket.smartlobby.lobby.Lobby;
 	import net.smartsocket.smartlobby.tools.*;
 	
 	public class GameList extends MovieClip
@@ -49,7 +50,23 @@ package net.smartsocket.smartlobby.lobby.components
 				listType.y = 0;
 				
 								
-				listType._list.columns = ["ID","Name","Map","Current","Max","Creator","Status","Private"];
+				if(!Lobby.customGameListColumns) {
+					trace("Setting default columns.");
+					listType._list.columns = ["ID","Name","Map","Current","Max","Creator","Status","Private"];
+				}else {
+					trace("Setting custom columns.");
+					listType._list.columns = Lobby.customGameListColumns
+				}
+				
+				for(var i in Lobby.customGameListColumnWidths) {
+					var column = listType._list.getColumnAt( i );
+					var value:int = Lobby.customGameListColumnWidths[i];
+					
+					if(value) {
+						column.width = value;
+					}
+				}
+				
 				listType._list.dataProvider = new DataProvider(new Array());
 				
 				listType.addEventListener(MouseEvent.DOUBLE_CLICK, joinRoom);

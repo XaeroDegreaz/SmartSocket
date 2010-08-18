@@ -35,16 +35,15 @@ package net.smartsocket.smartlobby.lobby
 		public var options;
 		
 		public var pm:PrivateMessages;
-		public var customGameListColumns:Array;
-		public var customGameListWidths:Array;
+		public static var customGameListColumns:Array;
+		public static var customGameListColumnWidths:Array;
 		
-		public function Lobby($customGameListColumns:Array = null, $customGameListWidths:Array = null)
+		public function Lobby($customGameListColumns:Array = null, $customGameListColumnWidths:Array = null)
 		{
 			
-			customGameListWidths = $customGameListWidths;
+			customGameListColumnWidths = $customGameListColumnWidths;
 			customGameListColumns = $customGameListColumns;
 			SmartLobby.lobby = this;
-			
 			trace("Lobby has been initialized.");
 						
 			pm = new PrivateMessages();
