@@ -20,7 +20,6 @@ the terms of any one of the MPL, the GPL or the LGPL.
 package net.smartsocket.smartlobby {
 	import com.adobe.serialization.json.JSON;
 	import com.adobe.serialization.json.JSONDecoder;
-	import com.dynamicflash.util.Base64;
 	
 	import flash.events.*;
 	import flash.events.EventDispatcher;

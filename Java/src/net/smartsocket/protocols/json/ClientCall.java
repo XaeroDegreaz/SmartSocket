@@ -30,7 +30,8 @@ public class ClientCall extends JSONArray{
      * @param key The key name of the property
      * @param value The value of the property
      */
-    public void put(Object key, Object value) {
+    public ClientCall put(Object key, Object value) {
 	properties.put(key, value);
+	return this;
     }
 }
