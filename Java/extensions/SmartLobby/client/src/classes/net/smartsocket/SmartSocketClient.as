@@ -98,6 +98,7 @@ package net.smartsocket {
 							customListeners[j][method](params);
 						}catch(e:Error) {
 							trace("SmartSocketClient => "+method+" has errors: "+e);
+							trace(e.getStackTrace());
 						}finally {
 							
 						}

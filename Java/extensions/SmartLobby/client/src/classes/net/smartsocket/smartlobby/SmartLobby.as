@@ -104,6 +104,7 @@ package net.smartsocket.smartlobby {
 								SmartLobby.customListeners[j][method](params);
 							}catch(e:Error) {
 								trace("SmartLobby => "+method+" has errors: "+e);
+								trace(e.getStackTrace());
 							}finally {
 								
 							}
