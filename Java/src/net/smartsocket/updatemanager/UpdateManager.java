@@ -19,6 +19,11 @@ public class UpdateManager {
     public Boolean updateAvailable = false;
 
     public UpdateManager(Boolean updateNow) {
+        
+        if(Loader._constants.get("AUTO_UPDATE").equals(false)) {
+            return;
+        }
+
 	Logger.log("Updater", "Checking for updates...");
 	try {
 	    URL remoteChecksumFile = new URL("http://github.com/XaeroDegreaz/SmartSocket/raw/master/Java/Update%20Checksum.md5");

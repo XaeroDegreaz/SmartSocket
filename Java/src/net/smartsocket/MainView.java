@@ -225,7 +225,7 @@ public class MainView extends FrameView {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel mainPanel;
-    private javax.swing.JMenuBar menuBar;
+    public static javax.swing.JMenuBar menuBar;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;

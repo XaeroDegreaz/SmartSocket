@@ -63,12 +63,15 @@ public class Main extends SingleFrameApplication {
 	while (MainView.consoleLog == null) {
 	    //# Here we are waiting for the console to initialize so we can use it.
 	}
+
+        //# Load the configuration file
+	_loader = new Loader();
+
 	//# Launch the update manager to try and get some updates for SmartSocket.
 	UpdateManager updateManager = new UpdateManager(true);
 	Logger.log("Main", "Initializing configuration...");
 
-	//# Load the configuration file
-	_loader = new Loader();
+	
 
 	try {
 	    Logger.log("Main", "Starting " + extension.getName() + " extension on port " + port);

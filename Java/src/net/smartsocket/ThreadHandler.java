@@ -218,7 +218,7 @@ public class ThreadHandler extends Thread implements Runnable {
 	try {
 	    //# We need to append a \r for SmartLobby on the client side.
 	    String toClient;
-	    toClient = data.toString() + "\r";
+	    toClient = data.toString() + Loader._constants.get("LINE_TERMINATION_CHARACTER").toString();
 
 	    //# Get the data being sent as bytes.
 	    if (Loader._constants.get("USE_ZLIB").equals(true)) {
