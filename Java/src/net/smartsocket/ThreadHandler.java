@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.Class;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Vector;
@@ -25,7 +26,7 @@ import org.json.simple.JSONValue;
  */
 public class ThreadHandler extends Thread implements Runnable {
 
-    static Vector handlers = new Vector(10);
+    public static Vector handlers = new Vector(10);
     public Socket socket;
     public String unique_identifier = null;
     //public String unique_threadName = null;
@@ -106,12 +107,12 @@ public class ThreadHandler extends Thread implements Runnable {
 		}
 
 	    } catch (Exception e) {
-		System.out.println("No process?.");
-		e.printStackTrace();
+		System.out.println("Invalid JSON input from client.");
+                Logger.log("ThreadHandler","Invalid JSON input from client.");
+		//e.printStackTrace();
 		//removeThread();
 	    }
 	}
-	System.out.println("Done reading?!");
     }
 
     private void removeThread() {
@@ -127,10 +128,18 @@ public class ThreadHandler extends Thread implements Runnable {
 
 	    try {
 		synchronized (handlers) {
-		    SmartLobby.onDisconnect(unique_identifier);
+
+                    try {
+                        //# SmartLobby specific
+                        SmartLobby.onDisconnect(unique_identifier);
+                    }catch(Exception ex) {
+                    }
+
 		    handlers.removeElement(this);
 		}
 	    } catch (Exception e) {
+                System.err.println("There was an error removing departing thread!");
+                Logger.log("ThreadHandler","There was an error removing departing thread!");
 	    }
 	}
 
@@ -198,8 +207,29 @@ public class ThreadHandler extends Thread implements Runnable {
 	    read();
 
 	} catch (Exception ioe) {
-	    ioe.printStackTrace();
+	    //ioe.printStackTrace();
 	    Logger.log("ThreadHandler", "Client disconnected.");
+            
+            try {
+                //# Send an extension onDisconnect signal: Thanks to Anthony Tyler for pointing this out
+                Class[] args = new Class[1];
+                Method m;
+
+                args[0] = ThreadHandler.class;
+
+                m = Server.extension.getMethod("onDisconnect", args);
+                Object params[] = {this};
+
+                m.invoke(Server.extensionInstance, params);
+            }catch(Exception e) {
+                System.err.println("A disconnect event was sent to the extension, however no matching method was found.");
+                Logger.log("ThreadHandler","A disconnect event was sent to the extension, however no matching method was found.");
+            }
+
+
+
+
+
 	} finally {
 	    Logger.log("ThreadHandler", "Cleaning up departing client streams...");
 	    removeThread();
