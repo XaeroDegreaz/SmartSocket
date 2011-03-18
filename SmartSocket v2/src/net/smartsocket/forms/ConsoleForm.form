@@ -124,7 +124,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lblUpstream">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Upstream: 0 kbps"/>
+        <Property name="text" type="java.lang.String" value="Upstream: 0 kb/s"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
@@ -132,7 +132,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lblDownstream">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Downstream: 0 kbps"/>
+        <Property name="text" type="java.lang.String" value="Downstream: 0 kb/s"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
@@ -148,7 +148,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lblMemoryUsage">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Memory Useage: 0 MB"/>
+        <Property name="text" type="java.lang.String" value="Memory Usage: 0 MB"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>

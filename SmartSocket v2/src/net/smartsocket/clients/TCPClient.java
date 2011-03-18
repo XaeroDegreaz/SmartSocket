@@ -51,6 +51,7 @@ public class TCPClient extends AbstractClient {
             StatisticsTracker.updateClientsConnectedLabel();
             //# Send an onconnect message to the extension
             _extension.onConnect(this);
+            _extension.addClient(this);
             //# Method used to setup initial streams, ie string, json, xml, binary streams, etc
             setupSession();
         }
@@ -85,6 +86,7 @@ public class TCPClient extends AbstractClient {
             StatisticsTracker.updateClientsConnectedLabel();
             //# Send onDisconnect message to our extension
             _extension.onDisconnect(this);
+            _extension.removeClient(this);
 
             //# Tidy up our resources
             try {
@@ -119,6 +121,8 @@ public class TCPClient extends AbstractClient {
      * @param line
      */
     private void process(String line) {
+        //# Add the size of this line of text to our inboundByte variable for gui usage
+        setInboundBytes( getInboundBytes() + line.getBytes().length ) ;
         Logger.log("Client "+Thread.currentThread().getId()+" says: "+line);
 
         //# Get ready to create dynamic method call to extension
@@ -144,6 +148,7 @@ public class TCPClient extends AbstractClient {
             Object[] o = {this, params};
             m = _extension.getExtension().getMethod(methodName, classes);
             m.invoke(_extension.getExtensionInstance(), o);
+            
         }catch(JSONException e) {
             Logger.log("["+_extension.getExtensionName()+"] Client has tried to pass invalid JSON");
         }catch(NoSuchMethodException e) {
@@ -162,6 +167,8 @@ public class TCPClient extends AbstractClient {
      * @see ClientCall
      */
     public void send(ClientCall message) {
+        //# Add the size of this line of text to our inboundByte variable for gui usage
+        setOutboundBytes( getOutboundBytes() + message.toString().getBytes().length ) ;
         _out.print(message.toString()+_extension.getNewlineCharacter());
         _out.flush();
     }

@@ -1,6 +1,7 @@
 package net.smartsocket.extensions;
 
 import java.net.*;
+import java.util.*;
 import net.smartsocket.Logger;
 import net.smartsocket.clients.TCPClient;
 import net.smartsocket.forms.ConsoleForm;
@@ -54,6 +55,11 @@ public abstract class TCPExtension extends AbstractExtension {
      */
     private String newlineCharacter = "\r\n";
 
+    /**
+     * This deque contains all of the clients that are currently connected to this TCPExtension instance.
+     */
+    private Deque<TCPClient> clients = new LinkedList<TCPClient>();
+
     public TCPExtension(int port) {
         synchronized(this) {
             this.port = port;
@@ -81,9 +87,10 @@ public abstract class TCPExtension extends AbstractExtension {
         while(!isConsoleFormRegistered){
 
         }
-        
+
+        //# Open a ServerSocket with a backlog of 500, which should be plenty...
         try {
-            setSocket(new ServerSocket(getPort()));
+            setSocket(new ServerSocket(getPort(), 500));
             setRunning(true);
             Logger.log("["+getExtensionName()+"] Extension running on port "+getPort());
 
@@ -134,6 +141,18 @@ public abstract class TCPExtension extends AbstractExtension {
     public static void broadcastMessage(ClientCall call) {
         synchronized(TCPClient.getClients()) {
             for(TCPClient client : TCPClient.getClients()) {
+                client.send(call);
+            }
+        }
+    }
+
+    /**
+     * Broadcast a message to all connected clients on this local TCPExtension instance
+     * @param call
+     */
+    public void broadcastMessageLocal(ClientCall call) {
+        synchronized(clients) {
+            for(TCPClient client : clients) {
                 client.send(call);
             }
         }
@@ -293,5 +312,26 @@ public abstract class TCPExtension extends AbstractExtension {
      */
     public void setNewlineCharacter(String newlineCharacter) {
         this.newlineCharacter = newlineCharacter;
+    }
+    /**
+     * This deque contains all of the clients that are currently connected to this TCPExtension instance.
+     * @return the allClients
+     */
+    public synchronized Deque<TCPClient> getClients() {
+        return clients;
+    }
+    /**
+     * Remove a TCPClient from the allClients deque from this extension instance.
+     * @param client The TCPClient to remove
+     */
+    public void removeClient(TCPClient client) {
+        clients.remove(client);
+    }
+    /**
+     * Add a TCPClient to the allClients deque from this extension instance.
+     * @param client The TCPClient to add
+     */
+    public void addClient(TCPClient client) {
+        clients.add(client);
     }
 }

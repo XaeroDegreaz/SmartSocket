@@ -68,10 +68,10 @@ public class ConsoleForm extends javax.swing.JFrame {
         scrollPaneCritical.setViewportView(logText);
         tabbedPane.addTab("Critical", scrollPaneCritical);
         lblConnectedClients.setText("Connected Clients: 0");
-        lblUpstream.setText("Upstream: 0 kbps");
-        lblDownstream.setText("Downstream: 0 kbps");
+        lblUpstream.setText("Upstream: 0 kb/s");
+        lblDownstream.setText("Downstream: 0 kb/s");
         lblUptime.setText("Uptime: 0 hrs");
-        lblMemoryUsage.setText("Memory Useage: 0 MB");
+        lblMemoryUsage.setText("Memory Usage: 0 MB");
         jMenu1.setText("File");
         menuBar.add(jMenu1);
         jMenu2.setText("Edit");
@@ -158,6 +158,9 @@ public class ConsoleForm extends javax.swing.JFrame {
                 } else {
                     SmartSocketServer.open();
                 }
+
+                //# Begin having the StatisticsTracker perform timed operations that display stats in GUi
+                StatisticsTracker.start();
             }
         });
         //# Mark the setup as complete so as not to allow other extensions to call this start method and mess up the console output
