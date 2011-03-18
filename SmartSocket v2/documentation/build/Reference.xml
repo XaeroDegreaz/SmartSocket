@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<book version="1.0" xml:lang="en" xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink">
+<book version="1.0" xml:lang="ab" xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink">
   <title>SmartSocket API</title>
   <info>
     <author>
@@ -18,7 +18,7 @@
       <holder>Jerome Doby</holder>
     </copyright>
     <releaseinfo>2.0</releaseinfo>
-    <date>March 15, 2011</date>
+    <date>March 18, 2011</date>
     <abstract>
       <para/>
     </abstract>
@@ -547,7 +547,7 @@
       <title>Class TCPClient</title>
       <indexterm><primary>TCPClient</primary></indexterm>
       <indexterm><primary>Classes</primary><secondary>TCPClient</secondary></indexterm>
-      <para>The TCPClient class controls the dedicated thread, and input/output for the TCP client. This class does not need to be instatiated by any end users; it&apos;s created automatically when the client is accepted by the server socket.</para>
+      <para>The TCPClient class controls the dedicated thread, and input/output for the TCP client. This class does not need to be instantiated by any end users; it&apos;s created automatically when the client is accepted by the server socket.</para>
       <sect2>
         <title>Synopsis</title>
         <classsynopsis class="class" language="java">
@@ -1243,6 +1243,25 @@
           <classsynopsisinfo role="comment">// Public Methods</classsynopsisinfo>
           <methodsynopsis language="java">
             <modifier>public</modifier>
+            <type>void</type>
+            <methodname>addClient</methodname>
+            <methodparam><type>TCPClient</type><parameter>client</parameter></methodparam>
+          </methodsynopsis>
+          <methodsynopsis language="java">
+            <modifier>public</modifier>
+            <type>void</type>
+            <methodname>broadcastMessageLocal</methodname>
+            <methodparam><type>ClientCall</type><parameter>call</parameter></methodparam>
+          </methodsynopsis>
+          <methodsynopsis language="java">
+            <modifier>public</modifier>
+            <modifier>synchronized</modifier>
+            <type>Deque&lt;TCPClient&gt;</type>
+            <methodname>getClients</methodname>
+            <void/>
+          </methodsynopsis>
+          <methodsynopsis language="java">
+            <modifier>public</modifier>
             <type>Class</type>
             <methodname>getExtension</methodname>
             <void/>
@@ -1312,6 +1331,12 @@
           </methodsynopsis>
           <methodsynopsis language="java">
             <modifier>public</modifier>
+            <type>void</type>
+            <methodname>removeClient</methodname>
+            <methodparam><type>TCPClient</type><parameter>client</parameter></methodparam>
+          </methodsynopsis>
+          <methodsynopsis language="java">
+            <modifier>public</modifier>
             <modifier>synchronized</modifier>
             <type>void</type>
             <methodname>run</methodname>
@@ -1350,6 +1375,33 @@
           </mediaobject>
         </informalfigure>
       </sect2>
+      <sect2 xml:id="method-net.smartsocket.extensions.TCPExtension.addClient-net.smartsocket.clients.TCPClient" xreflabel="addClient(net.smartsocket.clients.TCPClient)">
+        <title>addClient(TCPClient)<indexterm><primary>addClient</primary></indexterm><indexterm><primary>Methods</primary><secondary>addClient</secondary></indexterm></title>
+        <methodsynopsis language="java">
+          <modifier>public</modifier>
+          <type>void</type>
+          <methodname>addClient</methodname>
+          <methodparam><type>TCPClient</type><parameter>client</parameter></methodparam>
+        </methodsynopsis>
+        <para>Add a TCPClient to the allClients deque from this extension instance.</para>
+        <informaltable frame="all" role="parameter">
+          <?dbfo table-width="98%"?>
+          <tgroup cols="2">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="3*"/>
+            <tbody>
+              <row>
+                <entry align="left" nameend="c2" namest="c1"><para>Parameters</para>                  <?dbfo bgcolor="#eeeeee"?>
+</entry>
+              </row>
+              <row>
+                <entry><para>client</para></entry>
+                <entry><para> The TCPClient to add</para></entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </sect2>
       <sect2 xml:id="method-net.smartsocket.extensions.TCPExtension.broadcastMessage-net.smartsocket.protocols.json.ClientCall" xreflabel="broadcastMessage(net.smartsocket.protocols.json.ClientCall)">
         <title>broadcastMessage(ClientCall)<indexterm><primary>broadcastMessage</primary></indexterm><indexterm><primary>Methods</primary><secondary>broadcastMessage</secondary></indexterm></title>
         <methodsynopsis language="java">
@@ -1373,6 +1425,61 @@
               <row>
                 <entry><para>call</para></entry>
                 <entry><para/></entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </sect2>
+      <sect2 xml:id="method-net.smartsocket.extensions.TCPExtension.broadcastMessageLocal-net.smartsocket.protocols.json.ClientCall" xreflabel="broadcastMessageLocal(net.smartsocket.protocols.json.ClientCall)">
+        <title>broadcastMessageLocal(ClientCall)<indexterm><primary>broadcastMessageLocal</primary></indexterm><indexterm><primary>Methods</primary><secondary>broadcastMessageLocal</secondary></indexterm></title>
+        <methodsynopsis language="java">
+          <modifier>public</modifier>
+          <type>void</type>
+          <methodname>broadcastMessageLocal</methodname>
+          <methodparam><type>ClientCall</type><parameter>call</parameter></methodparam>
+        </methodsynopsis>
+        <para>Broadcast a message to all connected clients on this local TCPExtension instance</para>
+        <informaltable frame="all" role="parameter">
+          <?dbfo table-width="98%"?>
+          <tgroup cols="2">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="3*"/>
+            <tbody>
+              <row>
+                <entry align="left" nameend="c2" namest="c1"><para>Parameters</para>                  <?dbfo bgcolor="#eeeeee"?>
+</entry>
+              </row>
+              <row>
+                <entry><para>call</para></entry>
+                <entry><para/></entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </sect2>
+      <sect2 xml:id="method-net.smartsocket.extensions.TCPExtension.getClients" xreflabel="getClients()">
+        <title>getClients()<indexterm><primary>getClients</primary></indexterm><indexterm><primary>Methods</primary><secondary>getClients</secondary></indexterm></title>
+        <methodsynopsis language="java">
+          <modifier>public</modifier>
+          <modifier>synchronized</modifier>
+          <type>Deque&lt;TCPClient&gt;</type>
+          <methodname>getClients</methodname>
+          <void/>
+        </methodsynopsis>
+        <para>This deque contains all of the clients that are currently connected to this TCPExtension instance.</para>
+        <informaltable frame="all" role="parameter">
+          <?dbfo table-width="98%"?>
+          <tgroup cols="2">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="3*"/>
+            <tbody>
+              <row>
+                <entry align="left" nameend="c2" namest="c1"><para>Parameters</para>                  <?dbfo bgcolor="#eeeeee"?>
+</entry>
+              </row>
+              <row>
+                <entry><para><emphasis>return</emphasis></para></entry>
+                <entry><para> the allClients</para></entry>
               </row>
             </tbody>
           </tgroup>
@@ -1674,6 +1781,33 @@
               <row>
                 <entry><para>client</para></entry>
                 <entry><para/></entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </sect2>
+      <sect2 xml:id="method-net.smartsocket.extensions.TCPExtension.removeClient-net.smartsocket.clients.TCPClient" xreflabel="removeClient(net.smartsocket.clients.TCPClient)">
+        <title>removeClient(TCPClient)<indexterm><primary>removeClient</primary></indexterm><indexterm><primary>Methods</primary><secondary>removeClient</secondary></indexterm></title>
+        <methodsynopsis language="java">
+          <modifier>public</modifier>
+          <type>void</type>
+          <methodname>removeClient</methodname>
+          <methodparam><type>TCPClient</type><parameter>client</parameter></methodparam>
+        </methodsynopsis>
+        <para>Remove a TCPClient from the allClients deque from this extension instance.</para>
+        <informaltable frame="all" role="parameter">
+          <?dbfo table-width="98%"?>
+          <tgroup cols="2">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="3*"/>
+            <tbody>
+              <row>
+                <entry align="left" nameend="c2" namest="c1"><para>Parameters</para>                  <?dbfo bgcolor="#eeeeee"?>
+</entry>
+              </row>
+              <row>
+                <entry><para>client</para></entry>
+                <entry><para> The TCPClient to remove</para></entry>
               </row>
             </tbody>
           </tgroup>
@@ -2011,7 +2145,7 @@
       <title>Class StatisticsTracker</title>
       <indexterm><primary>StatisticsTracker</primary></indexterm>
       <indexterm><primary>Classes</primary><secondary>StatisticsTracker</secondary></indexterm>
-      <para>Statistics tracker is a class that controls displaying how many clients are connected, etc., in the bottom of the gui</para>
+      <para>Statistics tracker is a class that controls displaying how many clients are connected, etc., in the bottom of the GUI</para>
       <sect2>
         <title>Synopsis</title>
         <classsynopsis class="class" language="java">
@@ -2031,6 +2165,13 @@
             <modifier>public</modifier>
             <modifier>static</modifier>
             <type>void</type>
+            <methodname>start</methodname>
+            <void/>
+          </methodsynopsis>
+          <methodsynopsis language="java">
+            <modifier>public</modifier>
+            <modifier>static</modifier>
+            <type>void</type>
             <methodname>updateClientsConnectedLabel</methodname>
             <void/>
           </methodsynopsis>
@@ -2038,7 +2179,7 @@
             <modifier>public</modifier>
             <modifier>static</modifier>
             <type>void</type>
-            <methodname>updateDownstreamAvailableLabel</methodname>
+            <methodname>updateDownstreamLabel</methodname>
             <void/>
           </methodsynopsis>
           <methodsynopsis language="java">
@@ -2081,6 +2222,72 @@
             </imageobject>
           </mediaobject>
         </informalfigure>
+      </sect2>
+      <sect2 xml:id="method-net.smartsocket.forms.StatisticsTracker.start" xreflabel="start()">
+        <title>start()<indexterm><primary>start</primary></indexterm><indexterm><primary>Methods</primary><secondary>start</secondary></indexterm></title>
+        <methodsynopsis language="java">
+          <modifier>public</modifier>
+          <modifier>static</modifier>
+          <type>void</type>
+          <methodname>start</methodname>
+          <void/>
+        </methodsynopsis>
+        <para>Start the timer which controls displaying memory, uptime, upstream, and downstream</para>
+      </sect2>
+      <sect2 xml:id="method-net.smartsocket.forms.StatisticsTracker.updateClientsConnectedLabel" xreflabel="updateClientsConnectedLabel()">
+        <title>updateClientsConnectedLabel()<indexterm><primary>updateClientsConnectedLabel</primary></indexterm><indexterm><primary>Methods</primary><secondary>updateClientsConnectedLabel</secondary></indexterm></title>
+        <methodsynopsis language="java">
+          <modifier>public</modifier>
+          <modifier>static</modifier>
+          <type>void</type>
+          <methodname>updateClientsConnectedLabel</methodname>
+          <void/>
+        </methodsynopsis>
+        <para>This is called when a user connects or disconnects from the server, showing the correct number in the GUI</para>
+      </sect2>
+      <sect2 xml:id="method-net.smartsocket.forms.StatisticsTracker.updateDownstreamLabel" xreflabel="updateDownstreamLabel()">
+        <title>updateDownstreamLabel()<indexterm><primary>updateDownstreamLabel</primary></indexterm><indexterm><primary>Methods</primary><secondary>updateDownstreamLabel</secondary></indexterm></title>
+        <methodsynopsis language="java">
+          <modifier>public</modifier>
+          <modifier>static</modifier>
+          <type>void</type>
+          <methodname>updateDownstreamLabel</methodname>
+          <void/>
+        </methodsynopsis>
+        <para>Display the server&apos;s current downstream</para>
+      </sect2>
+      <sect2 xml:id="method-net.smartsocket.forms.StatisticsTracker.updateMemoryUsageLabel" xreflabel="updateMemoryUsageLabel()">
+        <title>updateMemoryUsageLabel()<indexterm><primary>updateMemoryUsageLabel</primary></indexterm><indexterm><primary>Methods</primary><secondary>updateMemoryUsageLabel</secondary></indexterm></title>
+        <methodsynopsis language="java">
+          <modifier>public</modifier>
+          <modifier>static</modifier>
+          <type>void</type>
+          <methodname>updateMemoryUsageLabel</methodname>
+          <void/>
+        </methodsynopsis>
+        <para>Display roughly the server&apos;s current memory usage.</para>
+      </sect2>
+      <sect2 xml:id="method-net.smartsocket.forms.StatisticsTracker.updateUpstreamLabel" xreflabel="updateUpstreamLabel()">
+        <title>updateUpstreamLabel()<indexterm><primary>updateUpstreamLabel</primary></indexterm><indexterm><primary>Methods</primary><secondary>updateUpstreamLabel</secondary></indexterm></title>
+        <methodsynopsis language="java">
+          <modifier>public</modifier>
+          <modifier>static</modifier>
+          <type>void</type>
+          <methodname>updateUpstreamLabel</methodname>
+          <void/>
+        </methodsynopsis>
+        <para>Display the server&apos;s current upstream</para>
+      </sect2>
+      <sect2 xml:id="method-net.smartsocket.forms.StatisticsTracker.updateUptimeLabel" xreflabel="updateUptimeLabel()">
+        <title>updateUptimeLabel()<indexterm><primary>updateUptimeLabel</primary></indexterm><indexterm><primary>Methods</primary><secondary>updateUptimeLabel</secondary></indexterm></title>
+        <methodsynopsis language="java">
+          <modifier>public</modifier>
+          <modifier>static</modifier>
+          <type>void</type>
+          <methodname>updateUptimeLabel</methodname>
+          <void/>
+        </methodsynopsis>
+        <para>Show the uptime of the server in the GUI</para>
       </sect2>
     </sect1>
   </chapter>
@@ -10872,11 +11079,11 @@
             </row>
             <row>
               <entry><para>Totals Fields</para></entry>
-              <entry><para>68</para></entry>
+              <entry><para>74</para></entry>
             </row>
             <row>
               <entry><para>Totals Methods</para></entry>
-              <entry><para>238</para></entry>
+              <entry><para>243</para></entry>
             </row>
             <row>
               <entry><para>Public Classes</para></entry>
@@ -10888,7 +11095,7 @@
             </row>
             <row>
               <entry><para>Public Methods</para></entry>
-              <entry><para>210</para></entry>
+              <entry><para>215</para></entry>
             </row>
             <row>
               <entry><para>Protected Fields</para></entry>
@@ -10912,7 +11119,7 @@
             </row>
             <row>
               <entry><para>Private Fields</para></entry>
-              <entry><para>37</para></entry>
+              <entry><para>43</para></entry>
             </row>
             <row>
               <entry><para>Private Methods</para></entry>

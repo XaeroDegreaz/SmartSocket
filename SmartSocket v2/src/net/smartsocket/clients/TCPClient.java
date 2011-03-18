@@ -14,7 +14,7 @@ import org.json.*;
 
 /**
  * The TCPClient class controls the dedicated thread, and input/output for the TCP client.
- * This class does not need to be instatiated by any end users; it's created automatically when the
+ * This class does not need to be instantiated by any end users; it's created automatically when the
  * client is accepted by the server socket.
  * @author XaeroDegreaz
  */
