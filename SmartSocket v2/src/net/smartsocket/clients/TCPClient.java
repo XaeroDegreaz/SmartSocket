@@ -4,8 +4,12 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.logging.Level;
 import net.smartsocket.Logger;
 import net.smartsocket.extensions.TCPExtension;
 import net.smartsocket.forms.StatisticsTracker;
@@ -22,7 +26,8 @@ public class TCPClient extends AbstractClient {
     /**
      * The number of outbound bytes that have been received since the last wipe on the StatisticsTracker poll.
      */
-    private static Deque<TCPClient> clients = new LinkedList<TCPClient>();
+    //private static Deque<TCPClient> clients = new LinkedList<TCPClient>();
+    private static Map<Object, TCPClient> clients = Collections.synchronizedMap(new HashMap<Object, TCPClient>());
     private static long inboundBytes = 0;
     private static long outboundBytes = 0;
 
@@ -44,14 +49,17 @@ public class TCPClient extends AbstractClient {
      */
     public void run() {
         Logger.log("There are currently: "+Thread.activeCount()+" thread active in this group.");
-        synchronized(clients) {
-            //# Add this to the deck
-            clients.add(this);
+        synchronized(this) {
+            try {
+                //# Setup the uniqueId for this client.
+                this.setUniqueId(this.toString());
+            } catch (Exception ex) {
+                //# This should never happen since each thread name is unique.......
+            }
             //# Update the interface to show new connection
             StatisticsTracker.updateClientsConnectedLabel();
             //# Send an onconnect message to the extension
             _extension.onConnect(this);
-            _extension.addClient(this);
             //# Method used to setup initial streams, ie string, json, xml, binary streams, etc
             setupSession();
         }
@@ -79,14 +87,17 @@ public class TCPClient extends AbstractClient {
      * Destroy the client session and remove the thread.
      */
     private void destroySession() {
-        synchronized(clients) {
-            //# Remove this client from the thread deque
-            clients.remove(this);
-            //# Update the interface to show new connection
-            StatisticsTracker.updateClientsConnectedLabel();
-            //# Send onDisconnect message to our extension
+        synchronized(this) {
+            //# Send onDisconnect message to our extension. This should happen before removing the client completely
+            //# that way our extension still has a valid TCPClient object to use on other operations
             _extension.onDisconnect(this);
+
+            //# Remove this client from the thread deque
+            clients.remove(this.uniqueId);
             _extension.removeClient(this);
+            
+            //# Update the interface to show new connection
+            StatisticsTracker.updateClientsConnectedLabel();          
 
             //# Tidy up our resources
             try {
@@ -177,16 +188,8 @@ public class TCPClient extends AbstractClient {
      * A list of all TCPClient objects that are running across all extensions
      * @return the clients
      */
-    public static Deque<TCPClient> getClients() {
+    public static Map<Object, TCPClient> getClients() {
         return clients;
-    }
-
-    /**
-     * A list of all TCPClient objects that are running across all extensions
-     * @param aClients the clients to set
-     */
-    private static void setClients(Deque<TCPClient> aClients) {
-        clients = aClients;
     }
 
     /**
@@ -219,5 +222,32 @@ public class TCPClient extends AbstractClient {
      */
     public static void setOutboundBytes(long aOutboundBytes) {
         outboundBytes = aOutboundBytes;
+    }
+
+    /**
+     * This method assigns a unique identifier to this client, like a login name, or other object.
+     * This method also adds the client to the clients list both for the static TCPClient.clients
+     * as well as the client list for the TCPExtension instance.
+     * @param uniqueId the uniqueId to set
+     */
+    public void setUniqueId(Object uniqueId) throws Exception {
+        //# First we add the new key, but check to make sure it's not in use.
+        if(!TCPClient.getClients().containsKey(uniqueId)) {
+            Logger.log("Unique ID change successful: "+this.uniqueId+"=>"+uniqueId);
+            TCPClient.getClients().put(uniqueId, this);
+            _extension.addClient(this);
+        }else {
+            throw new Exception("Unique identifier "+uniqueId+" already in use.");
+        }
+
+        //# Remove the old one.
+        if(TCPClient.getClients().containsKey(this.uniqueId)) {
+            Logger.log("Client already had uniqueId. Cleaning up old resource.");
+            TCPClient.getClients().remove(this.uniqueId);
+            _extension.removeClient(this);
+        }
+
+        //# Finally, set the new id.
+        this.uniqueId = uniqueId;
     }
 }

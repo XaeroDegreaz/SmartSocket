@@ -10,7 +10,7 @@ public class AbstractClient extends Thread {
     /**
      * Some sort of unique identifier to assign this client.
      */
-    private Object uniqueId;
+    protected Object uniqueId;
 
     public void AbstractClient() {
         
@@ -27,13 +27,4 @@ public class AbstractClient extends Thread {
     public Object getUniqueId() {
         return uniqueId;
     }
-
-    /**
-     * Some sort of unique identifier to assign this client.
-     * @param uniqueId the uniqueId to set
-     */
-    public void setUniqueId(Object uniqueId) {
-        this.uniqueId = uniqueId;
-    }
-
 }

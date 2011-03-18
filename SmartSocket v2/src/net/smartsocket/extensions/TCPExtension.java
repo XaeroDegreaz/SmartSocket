@@ -58,7 +58,7 @@ public abstract class TCPExtension extends AbstractExtension {
     /**
      * This deque contains all of the clients that are currently connected to this TCPExtension instance.
      */
-    private Deque<TCPClient> clients = new LinkedList<TCPClient>();
+    private Map<Object, TCPClient> clients = Collections.synchronizedMap( new HashMap<Object, TCPClient>() );
 
     public TCPExtension(int port) {
         synchronized(this) {
@@ -140,8 +140,8 @@ public abstract class TCPExtension extends AbstractExtension {
      */
     public static void broadcastMessage(ClientCall call) {
         synchronized(TCPClient.getClients()) {
-            for(TCPClient client : TCPClient.getClients()) {
-                client.send(call);
+            for(Map.Entry<Object, TCPClient> item : TCPClient.getClients().entrySet()) {
+                item.getValue().send(call);
             }
         }
     }
@@ -152,8 +152,8 @@ public abstract class TCPExtension extends AbstractExtension {
      */
     public void broadcastMessageLocal(ClientCall call) {
         synchronized(clients) {
-            for(TCPClient client : clients) {
-                client.send(call);
+            for(Map.Entry<Object, TCPClient> item : clients.entrySet()) {
+                item.getValue().send(call);
             }
         }
     }
@@ -317,21 +317,29 @@ public abstract class TCPExtension extends AbstractExtension {
      * This deque contains all of the clients that are currently connected to this TCPExtension instance.
      * @return the allClients
      */
-    public synchronized Deque<TCPClient> getClients() {
+    public Map<Object, TCPClient> getClients() {
         return clients;
     }
     /**
-     * Remove a TCPClient from the allClients deque from this extension instance.
+     * Remove a TCPClient from the allClients map from this extension instance.
      * @param client The TCPClient to remove
      */
     public void removeClient(TCPClient client) {
-        clients.remove(client);
+        clients.remove(client.getUniqueId());
     }
     /**
-     * Add a TCPClient to the allClients deque from this extension instance.
+     * Add a TCPClient to the allClients map from this extension instance.
      * @param client The TCPClient to add
      */
     public void addClient(TCPClient client) {
-        clients.add(client);
+        clients.put(client.getUniqueId(), client);
+    }
+    /**
+     * Return a TCPClient by its unique id
+     * @param uniqueId The uniqueId of the client for which you wish to retrieve
+     * @return The TCPClient instance with the requested uniqueId. Null if none is found.
+     */
+    public TCPClient getClientByUniqueId(Object uniqueId) {
+        return clients.get(uniqueId);
     }
 }

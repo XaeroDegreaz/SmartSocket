@@ -65,4 +65,30 @@ public class TCPTest1 extends TCPExtension {
         call.put("anotherProperty", "anotherValue");
         client.send(call);
     }
+
+    /**
+     * A very simple login mechanism.
+     * @param client
+     * @param json
+     * @throws JSONException
+     */
+    public void onLogin(TCPClient client, JSONObject json) throws JSONException {
+        try {
+            client.setUniqueId(json.getString("username"));
+            
+            ClientCall call = new ClientCall("onLogin");
+            call.put("username", json.get("username"));
+            call.put("message", "Thank you for logging in.");
+            client.send(call);
+        }catch(Exception e) {
+            Logger.log(e.getMessage());
+
+            ClientCall call = new ClientCall("onLoginFail");
+            call.put("error", "That username is taken.");
+            client.send(call);
+        }
+
+        //# Do some stuff with the client.
+
+    }
 }
