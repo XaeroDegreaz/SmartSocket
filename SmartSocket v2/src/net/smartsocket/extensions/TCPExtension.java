@@ -2,6 +2,7 @@ package net.smartsocket.extensions;
 
 import java.net.*;
 import java.util.*;
+import net.smartsocket.Config;
 import net.smartsocket.Logger;
 import net.smartsocket.clients.TCPClient;
 import net.smartsocket.forms.ConsoleForm;
@@ -87,7 +88,7 @@ public abstract class TCPExtension extends AbstractExtension {
         while(!isConsoleFormRegistered){
 
         }
-
+        Config.load();
         //# Open a ServerSocket with a backlog of 500, which should be plenty...
         try {
             setSocket(new ServerSocket(getPort(), 500));
@@ -119,12 +120,13 @@ public abstract class TCPExtension extends AbstractExtension {
             try {
                 //# Accept client
                 client = getSocket().accept();
-                Logger.log("["+getExtensionName()+"] New client accepted: ");
-                //# Spawn their own thread
-                new TCPClient(client, this).start();
+                Logger.log("["+getExtensionName()+"] New client accepted: ");                
             }catch(Exception e) {
                 Logger.log("["+getExtensionName()+"] Error accepting client: "+e.getMessage());
             }
+
+            //# Spawn their own thread
+            new TCPClient(client, this).start();
         }
         //# If we get here, the server is stopped.
         Logger.log("["+getExtensionName()+"] The server has stopped running.");

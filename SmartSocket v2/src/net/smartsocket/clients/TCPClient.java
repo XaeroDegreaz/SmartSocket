@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Level;
-import net.smartsocket.Logger;
+import net.smartsocket.*;
 import net.smartsocket.extensions.TCPExtension;
 import net.smartsocket.forms.StatisticsTracker;
 import net.smartsocket.protocols.json.ClientCall;
@@ -63,9 +63,26 @@ public class TCPClient extends AbstractClient {
             //# Method used to setup initial streams, ie string, json, xml, binary streams, etc
             setupSession();
         }
-        //# Begin the read loop for this client's streams.
+        //# Begin the read loop for this client's streams..
+        sendPolicyFile();
         read();
         destroySession();
+    }
+
+    private void sendPolicyFile() {
+        byte nullByte = '\u0000';
+        try {            
+            if( Config.crossdomainPolicyFile.getBoolean("enabled") ) {
+                Logger.log("Sending crossdomain policy file.");
+                _out.write( Config.crossdomainPolicyFile.getString("content") );
+                _out.write( nullByte );
+                _out.flush();
+            }else {
+                Logger.log(Config.crossdomainPolicyFile);
+            }
+        }catch(Exception e) {
+            Logger.log("Error sending crossdomain policy file: "+e.getMessage());
+        }
     }
 
     /**
