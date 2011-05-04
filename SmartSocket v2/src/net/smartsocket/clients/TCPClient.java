@@ -5,11 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.Level;
 import net.smartsocket.*;
 import net.smartsocket.extensions.TCPExtension;
 import net.smartsocket.forms.StatisticsTracker;
@@ -136,6 +133,7 @@ public class TCPClient extends AbstractClient {
 
         try {
             while(!(input = _in.readLine()).equals(null)) {
+                //# TODO - Add some different processing method calls here (xml, raw). Add some try/catch blocks to go down the line.
                 process(input);
             }
         }catch(Exception e) {
@@ -172,10 +170,16 @@ public class TCPClient extends AbstractClient {
             methodName = jsonA.getString(0);
             params = jsonA.getJSONObject(1);
 
-            //# Try to call the method on the desired extension class
-            Object[] o = {this, params};
-            m = _extension.getExtension().getMethod(methodName, classes);
-            m.invoke(_extension.getExtensionInstance(), o);
+            //# First let's send this message to the extensions onDataSpecial to see if
+            //# the extension wants to process this message in its own special way.
+            if(_extension.onDataSpecial(this, methodName, params)) {
+
+                //# Try to call the method on the desired extension class
+                //# This is only executed if onDataSpecial returns true on our extension.
+                Object[] o = {this, params};
+                m = _extension.getExtension().getMethod(methodName, classes);
+                m.invoke(_extension.getExtensionInstance(), o);
+            }
             
         }catch(JSONException e) {
             Logger.log("["+_extension.getExtensionName()+"] Client has tried to pass invalid JSON");
@@ -194,7 +198,7 @@ public class TCPClient extends AbstractClient {
      * @param message
      * @see ClientCall
      */
-    public void send(ClientCall message) {
+    public void send(net.smartsocket.protocols.json.ClientCall message) {
         //# Add the size of this line of text to our inboundByte variable for gui usage
         setOutboundBytes( getOutboundBytes() + message.toString().getBytes().length ) ;
         _out.print(message.toString()+_extension.getNewlineCharacter());

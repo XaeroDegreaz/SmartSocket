@@ -1,4 +1,5 @@
 {
+    "config-version" : "2.0.0",
     "crossdomain-policy-file" :{
         "enabled" : false,
         "content" : "<cross-domain-policy><allow-access-from domain='*' to-ports='*'/></cross-domain-policy>"

@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.smartsocket;
 import java.io.*;
 import java.net.URL;
@@ -10,7 +5,10 @@ import org.json.*;
 
 
 /**
- *
+ * The Config class loads and/or generates a configuration file that helps make the server
+ * a little more customizable without having to recompile the server each time for a new change.
+ * The Config class has the ability to ensure that no user changes are lost when upgrading to a
+ * newer version of configuration file.
  * @author XaeroDegreaz
  */
 public class Config {
@@ -99,22 +97,28 @@ public class Config {
      */
     private static StringBuffer create() {
         Logger.log("Creating default configuration file 'config.json'...");
-        StringBuffer fileData = null;
+        StringBuffer fileData = getLocalConfig();
 
         try {
-            //# Grap the file from our resources package.
-            URL localConfigFile = Config.class.getResource("/net/smartsocket/resources/config.json");
-            InputStream localConfigFileStream = localConfigFile.openStream();
-            fileData = readFile(localConfigFileStream);
+            JSONObject json = new JSONObject( fileData.toString() );
+
+            //# Remove config version from the output
+            //# This config string will be used internally for
+            //# tracking versions of cingif files when writing new ones
+            //# or receiving new ones.
+            json.remove("config-version");
 
             //# Write configuration file.
             FileOutputStream out = new FileOutputStream("config.json");
-            out.write(fileData.toString().getBytes());
+            out.write(json.toString(4).getBytes());
             out.close();
 
-        }catch(Exception e) {
+        }catch(JSONException e) {
             //# Should never get here because the config file is packaged internaly...
-            Logger.log("Having a hard time locating internal config file. The program may not work properly.");
+            //# If it fails, probably a developer not formatting the config file properly.
+            Logger.log("Compiling and creating the config file failed. Ensure you have properly formatted JSON data before recompiling your extension.");
+        }catch (IOException e) {
+            Logger.log("Failed to write the configuration file: "+e.getMessage());
         }
         
         return fileData;
@@ -158,7 +162,33 @@ public class Config {
      * @param stream The target file, by string name.
      * @return The StringBuffer object representative of the loaded file
      */
-    private static StringBuffer readFile(String string) throws FileNotFoundException {
+    public static StringBuffer readFile(String string) throws FileNotFoundException {
         return readFile( new BufferedReader( new FileReader(string) ) );
+    }
+    //# TODO - Figure out the best way to do this configuration checking stuff...
+    /**
+     * This method basically checks our configuration file against the configuration file
+     * on the repository to ensure that the developers are always up to date with the latest
+     * configuration file.
+     */
+    private static void checkConfig() throws JSONException {
+        JSONObject localConfig = new JSONObject( getLocalConfig().toString() );
+        String version = localConfig.getString("config-version");
+        String[] revisions = version.split(".");
+        int lMajor = Integer.parseInt( revisions[0] );
+        int lMinor = Integer.parseInt( revisions[1] );
+        int lBug = Integer.parseInt( revisions[2] );
+    }
+
+    private static StringBuffer getLocalConfig() {
+        InputStream localConfigFileStream = null;
+        try {
+            //# Grab the file from our resources package.
+            URL localConfigFile = Config.class.getResource("/net/smartsocket/resources/config.json");
+            localConfigFileStream = localConfigFile.openStream();
+        }catch(Exception e) {
+            Logger.log("Having a hard time locating internal config file. The program may not work properly.");
+        }
+        return readFile(localConfigFileStream);
     }
 }

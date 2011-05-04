@@ -8,6 +8,7 @@ import net.smartsocket.clients.TCPClient;
 import net.smartsocket.forms.ConsoleForm;
 import net.smartsocket.forms.ExtensionConsole;
 import net.smartsocket.protocols.json.ClientCall;
+import org.json.JSONObject;
 
 /**
  * The TCPExtension class is an abstract class that provides the shell around which all extensions using the TCP protocol
@@ -135,7 +136,7 @@ public abstract class TCPExtension extends AbstractExtension {
     private void close() {
         setRunning(false);
     }
-
+    //# TODO - Add some diferent broadcast messages for different protocols as they are created.
     /**
      * Broadcast a message to all connected TCP clients
      * @param call
@@ -175,6 +176,17 @@ public abstract class TCPExtension extends AbstractExtension {
      * @param client
      */
     public abstract void onDisconnect(TCPClient client);
+    /**
+     * This method passes the complete data to the extension, without triggering
+     * any special methods (unless true is returned). This allows developers to have direct access to the
+     * JSONObject that has been passed to the extension, and route it different ways,
+     * if desired.
+     * @param client The client sending this message
+     * @param methodName The method to execute
+     * @param params The parameters to send to said method, in JSONObject form
+     * @return true if we wish to continue passing data to our other methods on the extension, and false if we will handle this call in this method only.
+     */
+    public abstract boolean onDataSpecial(TCPClient client, String methodName, JSONObject params);
 
     /**
      * The port number that this extension is running on

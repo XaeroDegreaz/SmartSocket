@@ -91,4 +91,9 @@ public class TCPTest1 extends TCPExtension {
         //# Do some stuff with the client.
 
     }
+
+    @Override
+    public boolean onDataSpecial(TCPClient client, String methodName, JSONObject params) {
+        return true;
+    }
 }

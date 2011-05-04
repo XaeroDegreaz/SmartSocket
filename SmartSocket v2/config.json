@@ -1,18 +1,18 @@
 {
-    "crossdomain-policy-file" :{
-        "enabled" : true,
-        "content" : "<cross-domain-policy><allow-access-from domain='*' to-ports='*'/></cross-domain-policy>"
+    "auto-update": {
+        "enabled": false,
+        "update-url": "https://github.com/XaeroDegreaz/SmartSocket/raw/master/SmartSocket%20v2/src/net/smartsocket/resources/update.txt"
     },
-    "tcp-extensions" : {
-        "protocol" : "json",
-        "raw-protocol-delimiters" : "?$$key=$$value"
+    "crossdomain-policy-file": {
+        "content": "<cross-domain-policy><allow-access-from domain='*' to-ports='*'/><\/cross-domain-policy>",
+        "enabled": false
     },
-    "udp-extensions" : {
-        "protocol" : "json",
-        "raw-protocol-delimiters" : "?$$key=$$value"
+    "tcp-extensions": {
+        "protocol": "json",
+        "raw-protocol-delimiters": "?$$key=$$value"
     },
-    "auto-update" : {
-        "enabled" : true,
-        "update-url" : "https://github.com/XaeroDegreaz/SmartSocket/raw/master/SmartSocket%20v2/src/net/smartsocket/resources/update.txt"
+    "udp-extensions": {
+        "protocol": "json",
+        "raw-protocol-delimiters": "?$$key=$$value"
     }
 }

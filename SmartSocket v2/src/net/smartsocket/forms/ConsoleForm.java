@@ -24,13 +24,14 @@ import net.smartsocket.SmartSocketServer;
 import net.smartsocket.extensions.AbstractExtension;
 
 /**
- * The ConsoleForm class is the hub of all gui activity.
+ * The ConsoleForm class is the hub of all GUI activity.
  * @author XaeroDegreaz
  */
 public class ConsoleForm extends javax.swing.JFrame {
 
     /** Creates new form ConsoleForm */
     public ConsoleForm() {
+        //# TODO - Think up some stuf for the drop down menus.
         Toolkit kit = Toolkit.getDefaultToolkit();
         initComponents();
 

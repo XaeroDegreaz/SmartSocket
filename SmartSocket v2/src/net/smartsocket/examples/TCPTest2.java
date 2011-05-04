@@ -65,4 +65,9 @@ public class TCPTest2 extends TCPExtension {
         call.put("anotherProperty", "anotherValue");
         client.send(call);
     }
+
+    @Override
+    public boolean onDataSpecial(TCPClient client, String methodName, JSONObject params) {
+        return true;
+    }
 }
