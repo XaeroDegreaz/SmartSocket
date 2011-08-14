@@ -1,5 +1,8 @@
 package net.smartsocket.clients;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,7 +14,6 @@ import net.smartsocket.*;
 import net.smartsocket.extensions.TCPExtension;
 import net.smartsocket.forms.StatisticsTracker;
 import net.smartsocket.protocols.json.ClientCall;
-import org.json.*;
 
 /**
  * The TCPClient class controls the dedicated thread, and input/output for the TCP client.
@@ -69,9 +71,9 @@ public class TCPClient extends AbstractClient {
     private void sendPolicyFile() {
         byte nullByte = '\u0000';
         try {            
-            if( Config.crossdomainPolicyFile.getBoolean("enabled") ) {
+            if( Config.crossdomainPolicyFile.get("enabled").getAsBoolean() ) {
                 Logger.log("Sending crossdomain policy file.");
-                _out.write( Config.crossdomainPolicyFile.getString("content") );
+                _out.write( Config.crossdomainPolicyFile.get("content").getAsString() );
                 _out.write( nullByte );
                 _out.flush();
             }else {
@@ -154,21 +156,19 @@ public class TCPClient extends AbstractClient {
         //# Get ready to create dynamic method call to extension
         Class[] classes = new Class[2];
         classes[0] = TCPClient.class;
-        classes[1] = JSONObject.class;
+        classes[1] = JsonObject.class;
         
         //# Reflection
         Method m = null;
 
         //# Setup method and params
         String methodName = null;
-        JSONObject params = null;        
-        JSONArray jsonA = null;
+        JsonObject params = null;
         
         try {
             //# Get the particulars of the JSON call from the client
-            jsonA = new JSONArray(line);
-            methodName = jsonA.getString(0);
-            params = jsonA.getJSONObject(1);
+            params = (JsonObject)new JsonParser().parse(line);
+            methodName = params.get("m").getAsString();
 
             //# First let's send this message to the extensions onDataSpecial to see if
             //# the extension wants to process this message in its own special way.
@@ -181,7 +181,7 @@ public class TCPClient extends AbstractClient {
                 m.invoke(_extension.getExtensionInstance(), o);
             }
             
-        }catch(JSONException e) {
+        }catch(JsonParseException e) {
             Logger.log("["+_extension.getExtensionName()+"] Client has tried to pass invalid JSON");
         }catch(NoSuchMethodException e) {
             Logger.log("["+_extension.getExtensionName()+"] The method: "+methodName+" does not exist");
@@ -200,8 +200,8 @@ public class TCPClient extends AbstractClient {
      */
     public void send(net.smartsocket.protocols.json.ClientCall message) {
         //# Add the size of this line of text to our inboundByte variable for gui usage
-        setOutboundBytes( getOutboundBytes() + message.toString().getBytes().length ) ;
-        _out.print(message.toString()+_extension.getNewlineCharacter());
+        setOutboundBytes( getOutboundBytes() + message.properties.toString().getBytes().length ) ;
+        _out.print(message.properties.toString()+_extension.getNewlineCharacter());
         _out.flush();
     }
 

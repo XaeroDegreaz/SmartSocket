@@ -1,5 +1,10 @@
 package net.smartsocket.smartlobby;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import java.io.FileNotFoundException;
 import java.lang.Class;
 import java.lang.reflect.InvocationTargetException;
@@ -12,7 +17,6 @@ import net.smartsocket.Logger;
 import net.smartsocket.clients.TCPClient;
 import net.smartsocket.extensions.TCPExtension;
 import net.smartsocket.protocols.json.ClientCall;
-import org.json.*;
 
 /**
  * The SmartLobby class is a class that controls and handles multi-user
@@ -20,29 +24,48 @@ import org.json.*;
  * This can be as simple as a chat room, or a full fledged multi-player game.
  * @author XaeroDegreaz
  */
-public class SmartLobby extends TCPExtension {
+public abstract class SmartLobby extends TCPExtension {
 
-    Map<String, User> userList = Collections.synchronizedMap( new HashMap<String, User>() );
-    Map<String, Room> roomList = Collections.synchronizedMap( new HashMap<String, Room>() );
-    public JSONObject config;
+    protected Map<String, User> userList = Collections.synchronizedMap(new HashMap<String, User>());
+    protected Map<String, Room> roomList = Collections.synchronizedMap(new HashMap<String, Room>());
+    protected JsonObject config;
+    protected Gson gson = new Gson();
+    //private SmartLobby extension;
 
     public SmartLobby(int port) {
         super(port);
+        //this.extension = extension;
     }
 
     @Override
     public void onExtensionReady() {
-        //# Add some code for initializing our default rooms.
+        onSmartLobbyReady();
+    }
+
+    /**
+     * Must be implemented by extending classes.
+     */
+    protected abstract void onSmartLobbyReady();
+
+    protected void setConfig(String file, String defaultRoomsKey) {
         try {
-            config = new JSONObject( Config.readFile("SmartLobbyConfig").toString() );
-
-            setDefaultRooms( config.getJSONArray("default-rooms") );
-
-        }catch(FileNotFoundException e) {
-            Logger.log("Cannot find the SmartLobby configuration file.");
-        }catch (JSONException e) {
-            Logger.log("Malformed JSONObject in the SmartLobby config file: "+e.getMessage());
+            config = (JsonObject) new JsonParser().parse(Config.readFile(file).toString());
+            System.out.println(config);
+            setDefaultRooms((JsonArray) config.get(defaultRoomsKey));
+        } catch (FileNotFoundException e) {
+            Logger.log("Cannot find the SmartLobby configuration file \'" + file + "\'.");
+        } catch (JsonParseException e) {
+            Logger.log("Malformed JSONObject in the SmartLobby config file: " + e.getMessage());
         }
+    }
+
+    protected void setConfig() {
+        setConfig("SmartLobbyConfig.json", "default-rooms");
+    }
+
+    protected void setConfig(JsonObject configJSON) {
+        config = configJSON;
+        Logger.log("Custom JSON Object being used for the SmartLobby configuration!");
     }
 
     @Override
@@ -52,7 +75,13 @@ public class SmartLobby extends TCPExtension {
 
     @Override
     public void onDisconnect(TCPClient client) {
-        //# Remove them from their room, if they are in one.
+        //# Remove them from their room, if they are in one
+        User user = getUserByTCPClient(client);
+        //# This is mostly a check for the crossdomain request;
+        //# we don't want to try to remove a non-existant user
+        if (user != null) {
+            user.getRoom().onUserLeave(user);
+        }
     }
 
     /**
@@ -64,124 +93,135 @@ public class SmartLobby extends TCPExtension {
      * @param params The parameters to send to said method, in JSONObject form
      */
     @Override
-    public boolean onDataSpecial(TCPClient client, String methodName, JSONObject params) {
+    public boolean onDataSpecial(TCPClient client, String methodName, JsonObject params) {
         User user = getUserByTCPClient(client);
         Method m = null;
         Class[] c = new Class[2];
         c[0] = User.class;
-        c[1] = JSONObject.class;
+        c[1] = JsonObject.class;
         Object[] o = {user, params};
-        try{
-            if( params.getString("for").equals("room") ) {
+        try {
+            if (params.get("for").toString().equals("room")) {
                 m = Room.class.getMethod(methodName, c);
                 m.invoke(user.getRoom(), o);
                 return false;
-            }else if( params.getString("for").equals("user") ) {
+            } else if (params.get("for").toString().equals("user")) {
                 m = User.class.getMethod(methodName, c);
                 m.invoke(user, o);
                 return false;
             }
-        }catch(JSONException e) {
-
-        }catch(NoSuchMethodException e) {
-
-        }catch(IllegalAccessException e) {
-
-        }catch(InvocationTargetException e) {
-
+        } catch (NoSuchMethodException e) {
+        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException e) {
         }
         return true;
     }
 
-    private void setDefaultRooms(JSONArray array) {
-        try {
-            //# Loop through the array and create some rooms
-            //# no username need be set; owner will be null wich will suffice
-            for(int i = 0; i < array.length(); i++) {
-                JSONObject r = array.getJSONObject(i);
-                roomList.put( r.getString("name"), new Room(r, this) );
-            }
-        }catch(JSONException e) {
-            Logger.log("There is a problem parsing some of the default rooms: "+e.getMessage());
-        }
+    private void setDefaultRooms(JsonArray array) {
+        //# Loop through the array and create some rooms
+        //# no username need be set; owner will be null wich will suffice
+        for (int i = 0; i < array.size(); i++) {
+            JsonObject r = (JsonObject) array.get(i);
 
+            Room rm = gson.fromJson(r.toString(), Room.class);
+
+            roomList.put(r.get("name").getAsString(), rm);
+        }
     }
 
-    public void onLogin(TCPClient client, JSONObject json) {
+    /**
+     * This is a very simple login mechanism that accepts a string name
+     * and creates a User object, then places it in the Collection.
+     * If you want more complex login mechanisms, please override this
+     * method in your SmartLobby extension.
+     * @param client
+     * @param json 
+     */
+    public void onLogin(TCPClient client, JsonObject json) {
         //# Perform some login logic here to see if user already logged in
         //# Perhaps evaluate to pass back to secondary callback for custom
         //# Logging in
-
-        userList.put( client.getUniqueId().toString(), new User( client, this) );
+        try {
+            client.setUniqueId(json.get("username").getAsString());
+            userList.put(client.getUniqueId().toString(), new User(client, this));
+        } catch (Exception e) {
+            Logger.log("SmartLobby username taken: " + e);
+        }
     }
 
-    /*
-     * The methods below are directly called on either a User object, or Room object.
+    /**
+     * Send a full list of users in all rooms to the specified client
+     * @param client
+     * @param json 
      */
-
-    public void getUserList(TCPClient client, JSONObject json) {
-
+    public void getFullUserList(TCPClient client, JsonObject json) {
     }
 
-    public void getRoomList(TCPClient client, JSONObject json) {
-
+    /**
+     * Send a full room list to the client
+     * @param client
+     * @param json 
+     */
+    public void getRoomList(TCPClient client, JsonObject json) {
+        ClientCall call = new ClientCall("onRoomList");
+        call.put("roomList", ClientCall.serialize(roomList));
+        client.send(call);
     }
 
-    public void createRoom(TCPClient client, JSONObject json) throws JSONException {
+    public void createRoom(TCPClient client, JsonObject json) {
         //# Make sure that only one room with same name registered
-        if( roomList.containsKey( json.getString("name") ) ) {
+        if (roomList.containsKey(json.get("name").getAsString())) {
             ClientCall call = new ClientCall("onCreateRoomError");
             call.put("message", "A room already exists with that name.");
             client.send(call);
             return;
         }
-        
+
         //# Make sure this user is not the owner of another room
         User user = getUserByTCPClient(client);
-        if(user.getRoom().getOwner() == user) {
+        if (user.getRoom().getOwner() == user) {
             ClientCall call = new ClientCall("onCreateRoomError");
             call.put("message", "You cannot create more than one room.");
             client.send(call);
             return;
         }
 
-        Room room = new Room(json, this).setOwner(user);
-        roomList.put( json.getString("name"), room );
+        Room room = gson.fromJson(json.toString(), Room.class);
+        room.setOwner(user);
 
-        joinRoom(room, getUserByTCPClient(client));
+        roomList.put(json.get("name").toString(), room);
+
+        room.onUserJoin(getUserByTCPClient(client));
     }
 
-    //# Would like to have joinROom inside the Room object, but think it's easier to maintain out here
-    public void joinRoom(TCPClient client, JSONObject json) throws JSONException {
-        Room room = getRoomByName( json.getString("name") );
+    //# Would like to have joinRoom inside the Room object, but think it's easier to maintain out here
+    public void joinRoom(TCPClient client, JsonObject json) {
+        Room room = getRoomByName(json.get("name").getAsString());
 
         if (room != null) {
-            joinRoom(room, getUserByTCPClient(client));
-        }else {
+            room.onUserJoin(getUserByTCPClient(client));
+        } else {
             ClientCall call = new ClientCall("onJoinRoomError");
             call.put("message", "The selected room is not available to join.");
         }
 
     }
 
-    private void joinRoom(Room room, User user) {
-        room.onUserJoin(user);
-    }
-
-    public void leaveRoom(TCPClient client, JSONObject json) {
-
+    public void leaveRoom(TCPClient client, JsonObject json) {
+        User user = getUserByTCPClient(client);
+        user.getRoom().onUserLeave(user);
     }
 
     //# Helper methods..
     public Room getRoomByName(String name) {
-       return roomList.get( name );
+        return roomList.get(name);
     }
 
     public User getUserByTCPClient(TCPClient client) {
-        return userList.get( client.getUniqueId().toString() );
+        return userList.get(client.getUniqueId().toString());
     }
 
     public User getUserByUsername(String username) {
-        return userList.get( username );
+        return userList.get(username);
     }
 }

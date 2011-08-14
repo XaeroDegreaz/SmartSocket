@@ -1,7 +1,9 @@
 package net.smartsocket;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import java.io.*;
 import java.net.URL;
-import org.json.*;
 
 
 /**
@@ -20,7 +22,7 @@ public class Config {
     /**
      * The JSONObject that holds all of the configuration information for the server.
      */
-    public static JSONObject configuration;
+    public static JsonObject configuration;
 
     //# Below are the configuration values.
     /**
@@ -30,7 +32,7 @@ public class Config {
      * Boolean <b>enabled</b> - Default true<br/>
      * String <b>content</b> - Generic XML crossdomain policy file.
      */
-    public static JSONObject crossdomainPolicyFile;
+    public static JsonObject crossdomainPolicyFile;
     /**
      * This configuration property contains the JSONObject pertaining to the TCPExtensions
      * overall config options.<br/><br/>
@@ -38,7 +40,7 @@ public class Config {
      * String <b>protocol</b> - Acceptable values: json, xml(todo), raw(todo)<br/>
      * String <b>raw-protocol-delimiters</b> - If the raw protocol is selected, then these will be the delimiters(todo).
      */
-    public static JSONObject tcpExtensions;
+    public static JsonObject tcpExtensions;
     /**
      * This configuration property contains the JSONObject pertaining to the UDPExtensions
      * overall config options.<br/><br/>
@@ -46,7 +48,7 @@ public class Config {
      * String <b>protocol</b> - Acceptable values: json, xml(todo), raw(todo)<br/>
      * String <b>raw-protocol-delimiters</b> - If the raw protocol is selected, then these will be the delimiters(todo).
      */
-    public static JSONObject udpExtensions;
+    public static JsonObject udpExtensions;
     /**
      * This configuration property contains the JSONObject pertaining to the auto update
      * feature.<br/><br/>
@@ -54,7 +56,7 @@ public class Config {
      * Boolean <b>enabled</b> - Default set to false<br/>
      * String <b>update-url</b> - Location should point to GitHup repo for SmartSocket.
      */
-    public static JSONObject autoUpdate;
+    public static JsonObject autoUpdate;
     //#####################################
 
     /**
@@ -68,22 +70,22 @@ public class Config {
         
         //# Read configuration file, and assign it to our configuration JSONObject
         try {
-            configuration = new JSONObject( readFile("config.json").toString() );
-        }catch(JSONException e) {
+            configuration = (JsonObject)new JsonParser().parse( readFile("config.json").toString() );
+        }catch(JsonParseException e) {
             //# Someone must have modified (poorly) the JSON configuration file.
             Logger.log("Malformed JSON in the configuration file.");
         }catch(FileNotFoundException e) {
             //# Couldn't find the config file, so we write our default one.
             Logger.log("Cannot find the configuration file. Creating default config file.");
-            configuration = new JSONObject ( create() );
+            configuration = (JsonObject)new JsonParser().parse( create().toString() );
         }
 
         //# Go ahead and assign these values. This is more for developers of SmartSocket than end-user use.
         try {            
-            Config.autoUpdate = configuration.getJSONObject("auto-update");
-            Config.crossdomainPolicyFile = configuration.getJSONObject("crossdomain-policy-file");
-            Config.tcpExtensions = configuration.getJSONObject("tcp-extensions");
-            Config.udpExtensions = configuration.getJSONObject("udp-extensions");
+            Config.autoUpdate = configuration.getAsJsonObject("auto-update");
+            Config.crossdomainPolicyFile = configuration.getAsJsonObject("crossdomain-policy-file");
+            Config.tcpExtensions = configuration.getAsJsonObject("tcp-extensions");
+            Config.udpExtensions = configuration.getAsJsonObject("udp-extensions");
         }catch(Exception e) {
             
         }
@@ -100,7 +102,7 @@ public class Config {
         StringBuffer fileData = getLocalConfig();
 
         try {
-            JSONObject json = new JSONObject( fileData.toString() );
+            JsonObject json = (JsonObject)new JsonParser().parse( fileData.toString() );
 
             //# Remove config version from the output
             //# This config string will be used internally for
@@ -110,10 +112,10 @@ public class Config {
 
             //# Write configuration file.
             FileOutputStream out = new FileOutputStream("config.json");
-            out.write(json.toString(4).getBytes());
+            out.write(json.toString().getBytes());
             out.close();
 
-        }catch(JSONException e) {
+        }catch(JsonParseException e) {
             //# Should never get here because the config file is packaged internaly...
             //# If it fails, probably a developer not formatting the config file properly.
             Logger.log("Compiling and creating the config file failed. Ensure you have properly formatted JSON data before recompiling your extension.");
@@ -171,9 +173,9 @@ public class Config {
      * on the repository to ensure that the developers are always up to date with the latest
      * configuration file.
      */
-    private static void checkConfig() throws JSONException {
-        JSONObject localConfig = new JSONObject( getLocalConfig().toString() );
-        String version = localConfig.getString("config-version");
+    private static void checkConfig() {
+        JsonObject localConfig = (JsonObject)new JsonParser().parse( getLocalConfig().toString() );
+        String version = localConfig.get("config-version").toString();
         String[] revisions = version.split(".");
         int lMajor = Integer.parseInt( revisions[0] );
         int lMinor = Integer.parseInt( revisions[1] );

@@ -1,5 +1,6 @@
 package net.smartsocket.extensions;
 
+import com.google.gson.JsonObject;
 import java.net.*;
 import java.util.*;
 import net.smartsocket.Config;
@@ -8,7 +9,6 @@ import net.smartsocket.clients.TCPClient;
 import net.smartsocket.forms.ConsoleForm;
 import net.smartsocket.forms.ExtensionConsole;
 import net.smartsocket.protocols.json.ClientCall;
-import org.json.JSONObject;
 
 /**
  * The TCPExtension class is an abstract class that provides the shell around which all extensions using the TCP protocol
@@ -186,7 +186,7 @@ public abstract class TCPExtension extends AbstractExtension {
      * @param params The parameters to send to said method, in JSONObject form
      * @return true if we wish to continue passing data to our other methods on the extension, and false if we will handle this call in this method only.
      */
-    public abstract boolean onDataSpecial(TCPClient client, String methodName, JSONObject params);
+    public abstract boolean onDataSpecial(TCPClient client, String methodName, JsonObject params);
 
     /**
      * The port number that this extension is running on

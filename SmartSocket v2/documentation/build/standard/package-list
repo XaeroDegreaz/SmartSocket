@@ -1,7 +1,0 @@
-net.smartsocket
-net.smartsocket.clients
-net.smartsocket.examples
-net.smartsocket.extensions
-net.smartsocket.forms
-net.smartsocket.protocols.json
-org.json

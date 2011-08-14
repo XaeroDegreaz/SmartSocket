@@ -12,13 +12,13 @@ import net.smartsocket.clients.TCPClient;
  * @author XaeroDegreaz
  */
 public final class User {
-    private static long currentUserID = 0;
-    private Room room = null;
-    private TCPClient tcpClient = null;
+    private transient static long currentUserID = 0;
+    private transient Room room;
+    private transient TCPClient tcpClient = null;
     private String username = null;
-    private FriendsList friendsList = null;
+    private transient FriendsList friendsList = null;
     private long userID;
-    private SmartLobby slInstance = null;
+    private transient SmartLobby slInstance = null;
 
     public User(TCPClient client, SmartLobby slInstance) {
         tcpClient = client;
@@ -29,9 +29,13 @@ public final class User {
     /**
      * @return the room
      */
-    public Room getRoom() {
+    public Room getRoom() { //SOmething like this 
         return this.room;
     }
+    
+    public Room getRoom(int key) {
+        return this.room;
+    } 
 
     /**
      * @param room the room to set
@@ -53,5 +57,12 @@ public final class User {
     private synchronized void setUserID() {
         this.userID = currentUserID;
         currentUserID++;
+    }
+
+    /**
+     * @return the tcpClient
+     */
+    public TCPClient getTcpClient() {
+        return tcpClient;
     }
 }

@@ -1,0 +1,13 @@
+{
+    "default-rooms":[
+        {
+            "name" : "Room 1",
+            "maxUsers" : 100,
+            "password" : "win"
+        },
+        {
+            "name" : "Room 2",
+            "maxUsers": 1000
+        }
+    ]
+}

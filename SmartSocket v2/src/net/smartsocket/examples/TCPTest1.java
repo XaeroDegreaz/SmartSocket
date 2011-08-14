@@ -1,11 +1,10 @@
 package net.smartsocket.examples;
 
+import com.google.gson.JsonObject;
 import net.smartsocket.Logger;
 import net.smartsocket.clients.TCPClient;
 import net.smartsocket.extensions.TCPExtension;
 import net.smartsocket.protocols.json.ClientCall;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * A very simple shell of a TCPExtension extension which includes all abstract methods and a simple onHelloWorld method.
@@ -43,7 +42,7 @@ public class TCPTest1 extends TCPExtension {
      * @param json
      * @throws JSONException
      */
-    public void onHelloWorld(TCPClient client, JSONObject json) throws JSONException {
+    public void onHelloWorld(TCPClient client, JsonObject json) {
         Logger.log("The value of \'test\' in your onHelloWorld call was: "+json.get("test"));
         //# ClientCalls can be strung together like so:
         /**
@@ -72,12 +71,12 @@ public class TCPTest1 extends TCPExtension {
      * @param json
      * @throws JSONException
      */
-    public void onLogin(TCPClient client, JSONObject json) throws JSONException {
+    public void onLogin(TCPClient client, JsonObject json) {
         try {
-            client.setUniqueId(json.getString("username"));
+            client.setUniqueId(json.get("username"));
             
             ClientCall call = new ClientCall("onLogin");
-            call.put("username", json.get("username"));
+            call.put("username", json.get("username").toString());
             call.put("message", "Thank you for logging in.");
             client.send(call);
         }catch(Exception e) {
@@ -93,7 +92,7 @@ public class TCPTest1 extends TCPExtension {
     }
 
     @Override
-    public boolean onDataSpecial(TCPClient client, String methodName, JSONObject params) {
+    public boolean onDataSpecial(TCPClient client, String methodName, JsonObject params) {
         return true;
     }
 }
