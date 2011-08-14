@@ -1,4 +1,4 @@
-package net.smartsocket.extensions;
+package net.smartsocket.serverextensions;
 
 /**
  * This class will end up mirroring TCPExtension in many ways.

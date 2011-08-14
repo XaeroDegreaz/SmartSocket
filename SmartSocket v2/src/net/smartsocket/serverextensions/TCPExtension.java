@@ -1,11 +1,11 @@
-package net.smartsocket.extensions;
+package net.smartsocket.serverextensions;
 
 import com.google.gson.JsonObject;
 import java.net.*;
 import java.util.*;
 import net.smartsocket.Config;
 import net.smartsocket.Logger;
-import net.smartsocket.clients.TCPClient;
+import net.smartsocket.serverclients.TCPClient;
 import net.smartsocket.forms.ConsoleForm;
 import net.smartsocket.forms.ExtensionConsole;
 import net.smartsocket.protocols.json.ClientCall;

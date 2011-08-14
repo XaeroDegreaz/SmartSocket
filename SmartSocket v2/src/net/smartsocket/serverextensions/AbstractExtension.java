@@ -1,4 +1,4 @@
-package net.smartsocket.extensions;
+package net.smartsocket.serverextensions;
 
 /**
  * This abstract extension is just a skeleton class that holds the runnable and thread

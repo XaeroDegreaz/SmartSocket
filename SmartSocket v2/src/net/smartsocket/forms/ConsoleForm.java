@@ -21,7 +21,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import net.smartsocket.SmartSocketServer;
-import net.smartsocket.extensions.AbstractExtension;
+import net.smartsocket.serverextensions.AbstractExtension;
 
 /**
  * The ConsoleForm class is the hub of all GUI activity.
@@ -31,7 +31,7 @@ public class ConsoleForm extends javax.swing.JFrame {
 
     /** Creates new form ConsoleForm */
     public ConsoleForm() {
-        //# TODO - Think up some stuf for the drop down menus.
+        //# TODO - Think up some stuff for the drop down menus.
         Toolkit kit = Toolkit.getDefaultToolkit();
         initComponents();
 

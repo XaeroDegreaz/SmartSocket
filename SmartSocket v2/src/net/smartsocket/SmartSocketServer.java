@@ -1,7 +1,7 @@
 package net.smartsocket;
 
-import net.smartsocket.clients.TCPClient;
-import net.smartsocket.clients.UDPClient;
+import net.smartsocket.serverclients.TCPClient;
+import net.smartsocket.serverclients.UDPClient;
 import net.smartsocket.forms.ConsoleForm;
 
 /**

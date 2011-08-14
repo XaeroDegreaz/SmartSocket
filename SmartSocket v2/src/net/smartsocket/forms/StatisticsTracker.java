@@ -3,7 +3,7 @@ package net.smartsocket.forms;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
-import net.smartsocket.clients.TCPClient;
+import net.smartsocket.serverclients.TCPClient;
 
 /**
  * Statistics tracker is a class that controls displaying how many clients are connected, etc., in the bottom of the GUI

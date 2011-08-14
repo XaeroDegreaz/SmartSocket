@@ -1,4 +1,4 @@
-package net.smartsocket.clients;
+package net.smartsocket.serverclients;
 
 /**
  * This class will end up mirroring TCPClient in many ways.

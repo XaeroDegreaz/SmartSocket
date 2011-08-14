@@ -1,4 +1,4 @@
-package net.smartsocket.clients;
+package net.smartsocket.serverclients;
 
 /**
  * Later on, when UDPClients become available, this class will have more effect.

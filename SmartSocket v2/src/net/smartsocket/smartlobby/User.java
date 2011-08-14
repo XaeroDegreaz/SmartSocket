@@ -5,7 +5,7 @@
 
 package net.smartsocket.smartlobby;
 
-import net.smartsocket.clients.TCPClient;
+import net.smartsocket.serverclients.TCPClient;
 
 /**
  *

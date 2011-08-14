@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import net.smartsocket.Config;
 import net.smartsocket.Logger;
-import net.smartsocket.clients.TCPClient;
-import net.smartsocket.extensions.TCPExtension;
+import net.smartsocket.serverclients.TCPClient;
+import net.smartsocket.serverextensions.TCPExtension;
 import net.smartsocket.protocols.json.ClientCall;
 
 /**
@@ -94,12 +94,25 @@ public abstract class SmartLobby extends TCPExtension {
      */
     @Override
     public boolean onDataSpecial(TCPClient client, String methodName, JsonObject params) {
+        Logger.log("On Data Special.");
         User user = getUserByTCPClient(client);
+        
+        //# No need to continue with processing onDataSpecial if this client is not logged in
+        //# We simply return out, and let the TCPClient object try to find the method.
+        if(user == null) {
+            return true;
+        }
+        
+        System.out.println(user);
         Method m = null;
+        
         Class[] c = new Class[2];
+        
         c[0] = User.class;
         c[1] = JsonObject.class;
+        
         Object[] o = {user, params};
+        
         try {
             if (params.get("for").toString().equals("room")) {
                 m = Room.class.getMethod(methodName, c);
@@ -137,15 +150,24 @@ public abstract class SmartLobby extends TCPExtension {
      * @param client
      * @param json 
      */
-    public void onLogin(TCPClient client, JsonObject json) {
+    public void login(TCPClient client, JsonObject json) {
         //# Perform some login logic here to see if user already logged in
         //# Perhaps evaluate to pass back to secondary callback for custom
         //# Logging in
         try {
             client.setUniqueId(json.get("username").getAsString());
             userList.put(client.getUniqueId().toString(), new User(client, this));
+            
+            ClientCall call = new ClientCall("onLogin");
+            call.put("username", json.get("username").getAsString());
+            client.send(call);
+            
         } catch (Exception e) {
             Logger.log("SmartLobby username taken: " + e);
+            
+            ClientCall call = new ClientCall("onLoginError");
+            call.put("error", "Username taken.");
+            client.send(call);
         }
     }
 

@@ -1,4 +1,4 @@
-package net.smartsocket.clients;
+package net.smartsocket.serverclients;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import net.smartsocket.*;
-import net.smartsocket.extensions.TCPExtension;
+import net.smartsocket.serverextensions.TCPExtension;
 import net.smartsocket.forms.StatisticsTracker;
 import net.smartsocket.protocols.json.ClientCall;
 
@@ -77,7 +77,7 @@ public class TCPClient extends AbstractClient {
                 _out.write( nullByte );
                 _out.flush();
             }else {
-                Logger.log(Config.crossdomainPolicyFile);
+                Logger.log("Not sending cross-domain-policy: "+Config.crossdomainPolicyFile);
             }
         }catch(Exception e) {
             Logger.log("Error sending crossdomain policy file: "+e.getMessage());
@@ -190,6 +190,8 @@ public class TCPClient extends AbstractClient {
         }catch(InvocationTargetException e) {
             Logger.log("["+_extension.getExtensionName()+"] The method: \'"+methodName+"\' reports: "+
                     e.getTargetException().getMessage()+" in JSONObject string: "+params.toString());
+        }catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -254,7 +256,7 @@ public class TCPClient extends AbstractClient {
     public void setUniqueId(Object uniqueId) throws Exception {
         //# First we add the new key, but check to make sure it's not in use.
         if(!TCPClient.getClients().containsKey(uniqueId)) {
-            Logger.log("Unique ID change successful: "+this.uniqueId+"=>"+uniqueId);
+            //Logger.log("Unique ID change successful: "+this.uniqueId+"=>"+uniqueId);
             TCPClient.getClients().put(uniqueId, this);
             _extension.addClient(this);
         }else {
