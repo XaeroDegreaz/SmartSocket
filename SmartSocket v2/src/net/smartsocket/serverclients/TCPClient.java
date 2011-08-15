@@ -204,6 +204,7 @@ public class TCPClient extends AbstractClient {
         //# Add the size of this line of text to our inboundByte variable for gui usage
         setOutboundBytes( getOutboundBytes() + message.properties.toString().getBytes().length ) ;
         _out.print(message.properties.toString()+_extension.getNewlineCharacter());
+        System.out.println(message.properties.toString());
         _out.flush();
     }
 
