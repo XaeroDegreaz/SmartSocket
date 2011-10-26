@@ -6,7 +6,7 @@ package net.smartsocket.tests;
 
 import com.google.gson.JsonObject;
 import net.smartsocket.client.SmartLobbyClient;
-import net.smartsocket.protocols.json.ClientCall;
+import net.smartsocket.protocols.json.RemoteCall;
 
 /**
  *

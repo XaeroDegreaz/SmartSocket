@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 import java.net.*;
 import com.google.gson.*;
 import java.lang.reflect.InvocationTargetException;
-import net.smartsocket.protocols.json.ClientCall;
+import net.smartsocket.protocols.json.RemoteCall;
 
 /**
  *
@@ -52,7 +52,7 @@ public abstract class SmartSocketClient extends Socket implements Runnable {
 	_listenerObject = this;
     }
 
-    public static void send(ClientCall call) {
+    public static void send(RemoteCall call) {
 	System.out.println("OUTGOING: " + call.properties.toString());
 	try {
 	    PrintWriter wr = new PrintWriter(
@@ -115,7 +115,7 @@ public abstract class SmartSocketClient extends Socket implements Runnable {
         try {
             //# Get the particulars of the JSON call from the client
             params = (JsonObject)new JsonParser().parse(line);
-            methodName = params.get("m").getAsString();
+            methodName = params.get("method").getAsString();
 
             Object[] o = {params};
             m = _listenerClass.getMethod(methodName, classes);

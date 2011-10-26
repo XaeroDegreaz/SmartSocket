@@ -1,6 +1,6 @@
 package net.smartsocket.client;
 
-import net.smartsocket.protocols.json.ClientCall;
+import net.smartsocket.protocols.json.RemoteCall;
 
 
 /**
@@ -18,7 +18,7 @@ public abstract class SmartLobbyClient extends SmartSocketClient {
     protected void onConnect(String connectMessage) {
         System.out.println(connectMessage);
         
-        ClientCall call = new ClientCall("login");
+        RemoteCall call = new RemoteCall("login");
         call.put("username", "Your Name");
         send(call);
     }

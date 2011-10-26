@@ -1,13 +1,17 @@
 {
-    "default-rooms":[
-        {
-            "name" : "Room 1",
-            "maxUsers" : 100,
-            "password" : "win"
-        },
-        {
-            "name" : "Room 2",
-            "maxUsers": 1000
-        }
-    ]
+	"default-rooms":[
+	{
+		"name" : "Room 1",
+		"maxUsers" : 100,
+		"password" : "",
+		"default" : true,
+		"isAcceptingBroadcastMessages": true
+	},
+	{
+		"name" : "Room 2",
+		"maxUsers": 1000,
+		"password": "",
+		"isAcceptingBroadcastMessages": true
+	}
+	]
 }

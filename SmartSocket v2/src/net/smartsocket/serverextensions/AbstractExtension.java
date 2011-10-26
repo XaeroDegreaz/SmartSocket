@@ -7,10 +7,10 @@ package net.smartsocket.serverextensions;
  * @author XaeroDegreaz
  */
 public abstract class AbstractExtension extends Thread {
-    public static boolean isConsoleFormRegistered = false;
 
-    @Override
-    public void run() {
+	public static boolean isConsoleFormRegistered = false;
 
-    }
+	@Override
+	public void run() {
+	}
 }

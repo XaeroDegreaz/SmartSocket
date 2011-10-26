@@ -11,6 +11,7 @@
     <png>0</png>
     <qt>0</qt>
     <rnwk>0</rnwk>
+    <swc>0</swc>
     <flashDefaultName>0</flashDefaultName>
     <projectorWinDefaultName>1</projectorWinDefaultName>
     <projectorMacDefaultName>1</projectorMacDefaultName>
@@ -20,19 +21,21 @@
     <pngDefaultName>1</pngDefaultName>
     <qtDefaultName>1</qtDefaultName>
     <rnwkDefaultName>1</rnwkDefaultName>
-    <flashFileName>C:\Users\XaeroDegreaz\Desktop\Code Projects\_Git\SmartSocket\Non-Java Client APIs\ActionScript 3.0\bin-debug\SmartSocket ActionScript 3.0 API.swf</flashFileName>
+    <swcDefaultName>1</swcDefaultName>
+    <flashFileName>G:\Dropbox\Code Projects\_Git\SmartSocket\Non-Java Client APIs\ActionScript 3.0\bin-debug\SmartSocket ActionScript 3.0 API.swf</flashFileName>
     <projectorWinFileName>SmartSocket ActionScript 3.0 API.exe</projectorWinFileName>
     <projectorMacFileName>SmartSocket ActionScript 3.0 API.app</projectorMacFileName>
-    <htmlFileName>C:\Users\XaeroDegreaz\Desktop\Code Projects\_Git\SmartSocket\Non-Java Client APIs\ActionScript 3.0\bin-debug\SmartSocket ActionScript 3.0 API.html</htmlFileName>
+    <htmlFileName>G:\Dropbox\Code Projects\_Git\SmartSocket\Non-Java Client APIs\ActionScript 3.0\bin-debug\SmartSocket ActionScript 3.0 API.html</htmlFileName>
     <gifFileName>SmartSocket ActionScript 3.0 API.gif</gifFileName>
     <jpegFileName>SmartSocket ActionScript 3.0 API.jpg</jpegFileName>
     <pngFileName>SmartSocket ActionScript 3.0 API.png</pngFileName>
     <qtFileName>SmartSocket ActionScript 3.0 API.mov</qtFileName>
     <rnwkFileName>SmartSocket ActionScript 3.0 API.smil</rnwkFileName>
+    <swcFileName>SmartSocket ActionScript 3.0 API.swc</swcFileName>
   </PublishFormatProperties>
   <PublishHtmlProperties enabled="true">
     <VersionDetectionIfAvailable>0</VersionDetectionIfAvailable>
-    <VersionInfo>10,1,52,0;9,0,124,0;8,0,24,0;7,0,14,0;6,0,79,0;5,0,58,0;4,0,32,0;3,0,8,0;2,0,1,12;1,0,0,1;</VersionInfo>
+    <VersionInfo>10,2,153,0;10,1,52,0;9,0,124,0;8,0,24,0;7,0,14,0;6,0,79,0;5,0,58,0;4,0,32,0;3,0,8,0;2,0,1,12;1,0,0,1;</VersionInfo>
     <UsingDefaultContentFilename>1</UsingDefaultContentFilename>
     <UsingDefaultAlternateFilename>1</UsingDefaultAlternateFilename>
     <ContentFilename>SmartSocket ActionScript 3.0 API_content.html</ContentFilename>
@@ -107,18 +110,18 @@
       <library-path-entry>
         <swc-path>$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc</swc-path>
         <linkage usesDefault="true">rsl</linkage>
-        <rsl-url>http://fpdownload.adobe.com/pub/swz/tlf/1.0.0.595/textLayout_1.0.0.595.swz</rsl-url>
+        <rsl-url>http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz</rsl-url>
         <policy-file-url>http://fpdownload.adobe.com/pub/swz/crossdomain.xml</policy-file-url>
-        <rsl-url>textLayout_1.0.0.595.swz</rsl-url>
+        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>
       </library-path-entry>
     </LibraryPath>
     <LibraryVersions>
       <library-version>
         <swc-path>$(AppConfig)/ActionScript 3.0/libs/11.0/textLayout.swc</swc-path>
-        <feature name="tlfText" majorVersion="1" minorVersion="0" build="595"/>
-        <rsl-url>http://fpdownload.adobe.com/pub/swz/tlf/1.0.0.595/textLayout_1.0.0.595.swz</rsl-url>
+        <feature name="tlfText" majorVersion="2" minorVersion="0" build="232"/>
+        <rsl-url>http://fpdownload.adobe.com/pub/swz/tlf/2.0.0.232/textLayout_2.0.0.232.swz</rsl-url>
         <policy-file-url>http://fpdownload.adobe.com/pub/swz/crossdomain.xml</policy-file-url>
-        <rsl-url>textLayout_1.0.0.595.swz</rsl-url>
+        <rsl-url>textLayout_2.0.0.232.swz</rsl-url>
       </library-version>
     </LibraryVersions>
   </PublishFlashProperties>
