@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.smartsocket.smartlobby;
 
 import com.google.gson.Gson;
