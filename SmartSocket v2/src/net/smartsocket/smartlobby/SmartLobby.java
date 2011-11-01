@@ -256,7 +256,7 @@ public abstract class SmartLobby extends TCPExtension {
 		if ( room != null ) {
 			//# Make sure the room is accepting new joiners (perhaps game already in session, or something)
 			//# Also, we need to ensure that users that have been kicked cannot re-join
-			if ( !room.isAcceptingNewJoiners || room.userList.containsValue( getUserByTCPClient( client ) ) ) {
+			if ( !room.isAcceptingNewJoiners || room.kickList.containsValue( getUserByTCPClient( client ) ) ) {
 				RemoteCall call = new RemoteCall( "onJoinRoomError" );
 				call.put( "message", "Room is locked-out." );
 				client.send( call );

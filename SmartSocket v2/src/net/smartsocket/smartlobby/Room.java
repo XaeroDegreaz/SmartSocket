@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.smartsocket.Logger;
 import net.smartsocket.protocols.json.RemoteCall;
 
 /**
@@ -81,7 +82,7 @@ public class Room {
 		
 		try {
 			if( ( defaultRoom == null ) && ( room.get( "default").getAsBoolean() == true ) ) {
-				isDefault = room.get( "default" ).getAsBoolean();
+				defaultRoom = this;
 				
 				//# Default rooms should not be password protected...
 				this.password = "";
@@ -102,7 +103,7 @@ public class Room {
 		try {
 			user.getRoom().onUserLeave( user );
 		} catch (Exception e) {
-			//Logger.log( "User does not have a room to leave... " + e.getMessage() );
+			Logger.log( "User does not have a room to leave... " + e.getMessage() );
 		}
 
 		this.userList.put( user.getUsername(), user );
@@ -178,9 +179,6 @@ public class Room {
 
 		isAcceptingNewJoiners = (isAcceptingNewJoiners) ? false : true;
 
-		//# Grab the user
-		User target = slInstance.getUserByUsername( json.get( "username" ).getAsString() );
-
 		RemoteCall call = new RemoteCall( "onRoomLockToggled" );
 		call.put( "roomID", this.roomID );
 		call.put( "name", this.name );
@@ -192,6 +190,7 @@ public class Room {
 	public void kickUser( User user, JsonObject json ) {
 		if ( getOwner() != user ) {
 			//# Illegal kick command.. maybe log this somewhere.
+			Logger.log("Invalid kick attempt.");
 			return;
 		}
 		//# Grab the user
@@ -199,7 +198,7 @@ public class Room {
 		
 		//# Make sure they aren't kicking themselves -_-
 		if( user == target ) {
-			return;
+			//return;
 		}
 		
 		//# Verify that the target is a member of THIS room
