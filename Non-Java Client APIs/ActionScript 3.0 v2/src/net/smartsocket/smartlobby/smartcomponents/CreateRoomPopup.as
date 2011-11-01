@@ -1,3 +1,21 @@
+/*
+Version: MPL 1.1/LGPL 2.1/GPL 2.0
+
+The contents of this file are subject to the Mozilla Public License Version 
+1.1 (the "License"); you may not use this file except in compliance with
+the License.
+
+The Original Code is the SmartSocket ActionScript 3 API SmartLobby CreateRoomPopup class.
+
+The Initial Developer of the Original Code is
+Jerome Doby www.smartsocket.net.
+Portions created by the Initial Developer are Copyright (C) 2009-2011
+the Initial Developer. All Rights Reserved.
+
+Alternatively, the contents of this file may be used under the terms of
+either of the GNU General Public License Version 2 or later (the "GPL")
+or the terms of any one of the MPL, the GPL or the LGPL.
+*/
 package net.smartsocket.smartlobby.smartcomponents {
 	import fl.controls.NumericStepper;
 	
@@ -16,12 +34,11 @@ package net.smartsocket.smartlobby.smartcomponents {
 		
 		public function CreateRoomPopup(smartLobbyInstance:SmartLobbyClient = null) {
 			super();
-			//SmartSocketClient.addDataListener("login", this);
 			if(smartLobbyInstance) {
 				this.smartLobbyInstance = smartLobbyInstance;
 			}
 			
-			//# Some beutification
+			//# Some beautification
 			this.filters = [new DropShadowFilter(4, 45, 0, .5, 4, 4, 1, 3, false, false, false)];
 		}
 		

@@ -5,17 +5,16 @@ The contents of this file are subject to the Mozilla Public License Version
 1.1 (the "License"); you may not use this file except in compliance with
 the License.
 
-The Original Code is the SmartSocket ActionScript 3 API client class..
+The Original Code is the SmartSocket ActionScript 3 API client class.
 
 The Initial Developer of the Original Code is
 Jerome Doby www.smartsocket.net.
-Portions created by the Initial Developer are Copyright (C) 2009-2010
+Portions created by the Initial Developer are Copyright (C) 2009-2011
 the Initial Developer. All Rights Reserved.
 
 Alternatively, the contents of this file may be used under the terms of
 either of the GNU General Public License Version 2 or later (the "GPL")
-or
-the terms of any one of the MPL, the GPL or the LGPL.
+or the terms of any one of the MPL, the GPL or the LGPL.
 */
 package net.smartsocket {
 	import com.adobe.serialization.json.JSON;
@@ -25,16 +24,24 @@ package net.smartsocket {
 	import flash.utils.ByteArray;
 	
 	import net.smartsocket.protocols.json.RemoteCall;
-	
+	/**
+	 * This is the base class that sends and routes RemoteCall messages to a SmartSocket server, and extensions. 
+	 * @author XaeroDegreaz
+	 * 
+	 */	
 	public class SmartSocketClient extends Socket {		
 		
 		//############### CONNECTION CONTROL
-		public function onConnect(e:Event):void{
-			trace("onConnect method currently does nothing. "+e);
-		}
+		public function onConnect(e:Event):void{trace("onConnect method currently does nothing. "+e);}
 		public function onDisconnect(e:Event):void{trace("onDisconnect method currently does nothing. "+e);}
 		public function onError(e:Event):void{trace("onError method currently does nothing. "+e);}
-		
+		/**
+		 * This will allow you to compress your RemoteCalls before sending them to she server.
+		 * However, I've not been able to create a stable ZlibInput/Outpus stream on the server, so
+		 * hack with this flag turned on at your own risk. You'll also need to mod, and recompile the server for this protocol to work.
+		 * If you are really interested, you'll can check the depreciated Java server's ThreadHandler class to see how the
+		 * Zlib in/out worked. If you get something stable, shoot me a line ;) 
+		 */		
 		public static var useZlib:Boolean = false;
 		
 		//# These are items that have registered themselves as listeners
@@ -68,6 +75,11 @@ package net.smartsocket {
 			_listeners[uniqueId] = null;
 		}
 		
+		/**
+		 * This does all of the processing and routing for our JSON transmissions from the server. 
+		 * @param event
+		 * 
+		 */		
 		protected function onJSON(event:ProgressEvent):void {			
 			var incoming:String;
 			
@@ -86,18 +98,22 @@ package net.smartsocket {
 			
 			trace("SmartSocketClient <= Received "+incoming.replace("\r\n",""));
 			
+			//# Sometimes two or more sends get jammed together when sending from the server when sent right next to eachother
+			//# This separates them into individial packets for processing / routing.
 			var arr:Array = incoming.split("\r\n");
 			arr.pop();
 			
+			//# Loop through each of the mashed together sends (if there are multiple)
 			for(var i:Number = 0; i < arr.length; i++) {
 				var data:String = arr[i];
 				
 				trace("SmartSocketClient ** Processing "+data);
 				
+				//# Construct a RemoteCall object from the string.
 				var remoteCall:RemoteCall = RemoteCall.constructFrom(data);
 				
 				if(remoteCall.directTo && remoteCall.directTo != "") {
-					//# Direct this call to target object
+					//# Here we try to direct this call to a target object, if the directTo property is not blank
 					try {
 						trace("SmartSocketClient ** Calling ["+remoteCall.method+"] on requested listener ["+remoteCall.directTo+"]");
 						_listeners[remoteCall.directTo][remoteCall.method](remoteCall);
@@ -108,6 +124,7 @@ package net.smartsocket {
 						trace("*****************");
 					}					
 				}else {
+					//# Otherwise, we just try the call on this object, or an object which has instantiated and sub-classed this (IE SmartLobby, or your extension / [sub-extensions])
 					try {
 						trace("SmartSocketClient ** No listener specified; calling ["+remoteCall.method+"] on "+this);
 						_instance[remoteCall.method](remoteCall);
@@ -121,10 +138,15 @@ package net.smartsocket {
 			}
 		}
 		
-		
-		public static function send(data:RemoteCall):Boolean {
+		/**
+		 * Send a RemoteCall object to the server for processing
+		 * @param call The RemoteCall object to send to the server.
+		 * @return true on sucess, false on failure.
+		 * 
+		 */		
+		public static function send(call:RemoteCall):Boolean {
 			//# Encode our client call to JSON
-			var json:String = JSON.encode(data);
+			var json:String = JSON.encode(call);
 			
 			try {
 				trace("SmartSocketClient => Sending "+json);
@@ -152,6 +174,5 @@ package net.smartsocket {
 			}
 			return false;
 		}
-		//##############
 	}
 }
