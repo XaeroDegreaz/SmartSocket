@@ -182,5 +182,8 @@ public class ConsoleForm extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
     private static JFrame instance = null;
     private static boolean isSetup = false;
-    public static Dimension screenSize;
+	/**
+	 * 
+	 */
+	public static Dimension screenSize;
 }

@@ -8,6 +8,11 @@ package net.smartsocket.serverextensions;
  */
 public abstract class AbstractExtension extends Thread {
 
+	/**
+	 * Internally used to know when the console form is up and going. This makes it so
+	 * multiple extensions that may be launched simultaneously aren't all trying to launch their own
+	 * GUI.
+	 */
 	public static boolean isConsoleFormRegistered = false;
 
 	@Override

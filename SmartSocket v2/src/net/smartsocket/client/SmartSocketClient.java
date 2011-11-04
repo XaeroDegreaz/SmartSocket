@@ -8,7 +8,8 @@ import java.lang.reflect.InvocationTargetException;
 import net.smartsocket.protocols.json.RemoteCall;
 
 /**
- *
+ * This is the main routing mechanism for Java <b>clients</b> who are using SmartSocket.
+ * It has not been thoroughly tested.
  * @author XaeroDegreaz
  */
 public abstract class SmartSocketClient extends Socket implements Runnable {
@@ -18,7 +19,13 @@ public abstract class SmartSocketClient extends Socket implements Runnable {
     private static boolean _connected = false;
 
     //# Connect using a timeout.
-    public SmartSocketClient(String host, int port, int timeout) {
+	/**
+	 * 
+	 * @param host
+	 * @param port
+	 * @param timeout
+	 */
+	public SmartSocketClient(String host, int port, int timeout) {
 	super();
 
 	try {
@@ -34,7 +41,12 @@ public abstract class SmartSocketClient extends Socket implements Runnable {
     }
 
     //# Overloaded constructor in case a timeout is not passed.
-    public SmartSocketClient(String host, int port) {
+	/**
+	 * 
+	 * @param host
+	 * @param port
+	 */
+	public SmartSocketClient(String host, int port) {
 	super();
 	try {
 	    InetAddress addr = InetAddress.getByName(host);
@@ -48,7 +60,11 @@ public abstract class SmartSocketClient extends Socket implements Runnable {
 	_listenerObject = this;
     }
 
-    public static void send(RemoteCall call) {
+	/**
+	 * 
+	 * @param call
+	 */
+	public static void send(RemoteCall call) {
 	System.out.println("OUTGOING: " + call.properties.toString());
 	try {
 	    PrintWriter wr = new PrintWriter(
@@ -60,11 +76,23 @@ public abstract class SmartSocketClient extends Socket implements Runnable {
 	}
     }
 
-    protected abstract void onConnect(String connectMessage);
+	/**
+	 * 
+	 * @param connectMessage
+	 */
+	protected abstract void onConnect(String connectMessage);
 
-    protected abstract void onConnectFail(Exception exception);
+	/**
+	 * 
+	 * @param exception
+	 */
+	protected abstract void onConnectFail(Exception exception);
 
-    protected abstract void onDisconnect(String disconnectMessage);
+	/**
+	 * 
+	 * @param disconnectMessage
+	 */
+	protected abstract void onDisconnect(String disconnectMessage);
 
     public void run() {
 	String str;

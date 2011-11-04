@@ -15,21 +15,25 @@ import javax.swing.SwingUtilities;
 public class Logger {
 
 	/**
-	 * This is the default level used for any log call that doesn't have an explicit log level defined
+	 * This is the default level used for any log call that doesn't have an explicit log level defined.
+	 * If this is set to 0, all incoming messages will be logged to the Critical pane. This is only recommended
+	 * when debugging, because it can cause higher memory usage than wanted; especially if you are sending 
+	 * hours and hours worth of chat messages, not to mention game calls to the logger.
 	 */
 	public final static int DEBUG = 0;
 	/**
-	 * This is a level above the debug level
+	 * This is a level above the debug level. This should be used sparingly for situations where you really want to have a certain
+	 * piece of information stored in the log window. Otherwise, if debugging, just log with 0, and turn Logger.setLogLevel(0) on.
 	 */
 	public final static int INFO = 1;
 	/**
-	 * The highest level of logging so far.
+	 * THis level should be used only when wanting to log a really important server event.
 	 */
 	public final static int CRITICAL = 2;
 	/**
-	 * The lowest level of log content to be displayed to the gui console
+	 * The lowest level of log content to be displayed to the GUI console. Default is 1 to prevent clutter, and high memory usage.
 	 */
-	private static int _logLevel = 0;
+	private static int _logLevel = 1;
 
 	/**
 	 * Here we finally display the information in the log after all of the details have been sorted out

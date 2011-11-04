@@ -61,6 +61,10 @@ public abstract class TCPExtension extends AbstractExtension {
 	 */
 	private Map<Object, TCPClient> clients = Collections.synchronizedMap( new HashMap<Object, TCPClient>() );
 
+	/**
+	 * Base class for extensions to create their own custom handling of RemoteCall objects.
+	 * @param port
+	 */
 	public TCPExtension( int port ) {
 		synchronized (this) {
 			this.port = port;
@@ -92,7 +96,7 @@ public abstract class TCPExtension extends AbstractExtension {
 		try {
 			setSocket( new ServerSocket( getPort(), 500 ) );
 			setRunning( true );
-			Logger.log( "[" + getExtensionName() + "] Extension running on port " + getPort() );
+			Logger.log( "[" + getExtensionName() + "] Extension running on port " + getPort(), Logger.CRITICAL );
 
 			//# Add custom tab for this extension...
 			ConsoleForm.tabbedPane.add( getExtensionName(), new ExtensionConsole( getExtensionName() ) );
@@ -162,7 +166,6 @@ public abstract class TCPExtension extends AbstractExtension {
 
 	/**
 	 * This method will be called on the extension the server is ready for business.
-	 * @param client
 	 */
 	public abstract void onExtensionReady();
 

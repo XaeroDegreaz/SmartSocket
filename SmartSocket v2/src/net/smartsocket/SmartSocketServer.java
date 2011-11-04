@@ -12,8 +12,14 @@ import net.smartsocket.forms.ConsoleForm;
  */
 public class SmartSocketServer {
 
-    public static SmartSocketServer extensionInstance;
-    public static int extensionPort;
+	/**
+	 * 
+	 */
+	public static SmartSocketServer extensionInstance;
+	/**
+	 * 
+	 */
+	public static int extensionPort;
 
     /**
      * @param args the command line arguments
@@ -28,6 +34,6 @@ public class SmartSocketServer {
      */
     public static void open() {
         Logger.log("SmartSocket is not meant to be used in this fashion. "
-                + "<a href='http://www.smartsocket.net' target='_new'>Click here</a> for detailed documentation.");
+                + "<a href='http://www.smartsocket.net' target='_new'>Click here</a> for detailed documentation.", Logger.CRITICAL);
     }
 }

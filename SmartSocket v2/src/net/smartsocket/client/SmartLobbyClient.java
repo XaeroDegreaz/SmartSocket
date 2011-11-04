@@ -4,17 +4,27 @@ import net.smartsocket.protocols.json.RemoteCall;
 
 
 /**
- *
+ * This will be the equivalent of the AS3 SmartLobbyClient when finished.
  * @author XaeroDegreaz
  */
 public abstract class SmartLobbyClient extends SmartSocketClient {
     //# TODO - Create the necessary client routines used in SmartLobby
     
-    public SmartLobbyClient(String host, int port, int timeout) {
+	/**
+	 * 
+	 * @param host
+	 * @param port
+	 * @param timeout
+	 */
+	public SmartLobbyClient(String host, int port, int timeout) {
         super(host, port, timeout);
     }
 
-    @Override
+	/**
+	 * 
+	 * @param connectMessage
+	 */
+	@Override
     protected void onConnect(String connectMessage) {
         System.out.println(connectMessage);
         
@@ -23,12 +33,20 @@ public abstract class SmartLobbyClient extends SmartSocketClient {
         send(call);
     }
 
-    @Override
+	/**
+	 * 
+	 * @param exception
+	 */
+	@Override
     protected void onConnectFail(Exception exception) {
         System.out.println(exception);;
     }
 
-    @Override
+	/**
+	 * 
+	 * @param disconnectMessage
+	 */
+	@Override
     protected void onDisconnect(String disconnectMessage) {
         System.out.println(disconnectMessage);;
     }

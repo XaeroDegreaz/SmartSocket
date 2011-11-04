@@ -107,6 +107,10 @@ package net.smartsocket {
 			dispatchEvent( new SmartLobbyEvent( SmartLobbyEvent[call.method], room ) );
 		}
 		
+		internal function onRoomJoinError(call:RemoteCall):void {			
+			dispatchEvent( new SmartLobbyEvent( SmartLobbyEvent[call.method], call ) );
+		}
+		
 		internal function onRoomLeave(call:RemoteCall):void {
 			var room:Room = roomList[call.name];
 			me.room = null;

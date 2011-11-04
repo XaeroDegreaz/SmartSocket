@@ -12,11 +12,18 @@ import net.smartsocket.protocols.json.RemoteCall;
  */
 public class TCPTest2 extends TCPExtension {
 
-    public static void main(String[] args) {
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
         new TCPTest2().start();
     }
 
-    public TCPTest2() {
+	/**
+	 * 
+	 */
+	public TCPTest2() {
         super(8890);
     }
 
@@ -40,7 +47,6 @@ public class TCPTest2 extends TCPExtension {
      * ["onHelloWorld",{"test","some test data"}]
      * @param client
      * @param json
-     * @throws JSONException
      */
     public void onHelloWorld(TCPClient client, JsonObject json) {
         Logger.log("The value of \'test\' in your onHelloWorld call was: "+json.get("test"));

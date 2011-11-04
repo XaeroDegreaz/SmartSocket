@@ -16,6 +16,13 @@ public final class User {
 	private long userID = -1;
 	private transient SmartLobby slInstance = null;
 
+	/**
+	 * This object contains the specifics of a TCPClient -- essentially, we are adding more features
+	 * to the TCPClient to give it a personality. Users can join rooms, play games, have user names
+	 * and have a friends list.
+	 * @param client The TCPClient bound to this User object
+	 * @param slInstance a valid reference to the main SmartLobby instance.
+	 */
 	public User( TCPClient client, SmartLobby slInstance ) {
 		tcpClient = client;
 		username = client.getUniqueId().toString();
@@ -34,18 +41,23 @@ public final class User {
 	}
 
 	/**
-	 * @return the room
+	 * @return The Room object of this User
 	 */
 	public Room getRoom() { //SOmething like this 
 		return this.room;
 	}
-
+	
+	/**
+	 * This is not yet used. This will be used for tracking user in multiple rooms.
+	 * @param key
+	 * @return 
+	 */
 	public Room getRoom( int key ) {
 		return this.room;
 	}
 
 	/**
-	 * @param room the room to set
+	 * @param room Sets the room of the user to this room.
 	 */
 	public void setRoom( Room room ) {
 		this.room = room;
@@ -59,7 +71,7 @@ public final class User {
 	}
 
 	/**
-	 * @param userID the userID to set
+	 * @param userID Assign this User a unique integer identifier.
 	 */
 	private synchronized void setUserID() {
 		this.userID = currentUserID;
@@ -67,21 +79,21 @@ public final class User {
 	}
 
 	/**
-	 * @return the tcpClient
+	 * @return The TCPClient of this User object.
 	 */
 	public TCPClient getTcpClient() {
 		return tcpClient;
 	}
 
 	/**
-	 * @return the username
+	 * @return The string username of this User
 	 */
 	public String getUsername() {
 		return username;
 	}
 
 	/**
-	 * @param username the username to set
+	 * @param username The username to assign to this user.
 	 */
 	public void setUsername( String username ) {
 		this.username = username;

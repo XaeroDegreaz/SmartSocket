@@ -11,6 +11,9 @@ import java.awt.Font;
  */
 public class ExtensionConsole extends JScrollPane {
 
+	/**
+	 * The pane controlling the GUI.
+	 */
 	public JEditorPane logText = new JEditorPane();
 
 	/**

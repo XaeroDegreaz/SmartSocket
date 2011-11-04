@@ -37,6 +37,11 @@ public class TCPClient extends AbstractClient {
 	private Socket _client = null;
 	private TCPExtension _extension = null;
 
+	/**
+	 * Creates a new thread for a client on a TCPExtension object.
+	 * @param client
+	 * @param extension
+	 */
 	public TCPClient( Socket client, TCPExtension extension ) {
 		this._client = client;
 		this._extension = extension;
@@ -264,6 +269,7 @@ public class TCPClient extends AbstractClient {
 	 * This method also adds the client to the clients list both for the static TCPClient.clients
 	 * as well as the client list for the TCPExtension instance.
 	 * @param uniqueId the uniqueId to set
+	 * @throws Exception  
 	 */
 	public void setUniqueId( Object uniqueId ) throws Exception {
 		//# First we add the new key, but check to make sure it's not in use.

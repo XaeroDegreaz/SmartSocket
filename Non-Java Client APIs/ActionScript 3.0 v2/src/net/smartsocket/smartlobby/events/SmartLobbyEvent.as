@@ -69,6 +69,10 @@ package net.smartsocket.smartlobby.events {
 		 */		
 		public static const onRoomJoin:String = "onRoomJoin";
 		/**
+		 * This is dispatched when THIS user has failed to join a room. SmartLobbyEvent.data is a RemoteCall object.
+		 */		
+		public static const onRoomJoinError:String = "onRoomJoinError";
+		/**
 		 * This is dispatched when THIS user has left a room. SmartLobbyEvent.data is a Room object.
 		 */		
 		public static const onRoomLeave:String = "onRoomLeave";

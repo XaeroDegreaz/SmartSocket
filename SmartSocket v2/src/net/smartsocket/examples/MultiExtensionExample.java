@@ -12,7 +12,11 @@ import net.smartsocket.examples.TCPTest1;
  */
 public class MultiExtensionExample {    
 
-    public static void main(String[] args) {
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
         MultiExtensionExample m = new MultiExtensionExample();
         TCPTest1.main(args);
         TCPTest2.main(args);
