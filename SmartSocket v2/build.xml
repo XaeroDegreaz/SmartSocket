@@ -8,8 +8,8 @@
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
 <project name="SmartSocket_v2" default="default" basedir=".">
-    <description>Builds, tests, and runs the project SmartSocket v2.</description>
-    <import file="nbproject/build-impl.xml"/>
+	<description>Builds, tests, and runs the project SmartSocket v2.</description>
+	<import file="nbproject/build-impl.xml"/>
     <!--
 
     There exist several targets which are by default empty and which can be 
@@ -71,4 +71,26 @@
     nbproject/build-impl.xml file. 
 
     -->
+	<target description="Sources to Jar" name="package-sources">
+		<jar basedir="src" destfile="dist/smartsocket-2.1.0-sources.jar"/>
+	</target>
+	
+	<target depends="-javadoc-build" description="JavaDoc to Jar" name="package-doc">
+		<jar basedir="dist/javadoc" destfile="dist/smartsocket-2.1.0-javadoc.jar"/>
+	</target>
+	
+	<target description="Libs and Dist to Jar" name="-post-jar" depends="package-sources, package-doc" >
+		<jar jarfile="dist/smartsocket-2.1.0.jar">
+            
+			<zipfileset src="${dist.jar}" excludes="META-INF/*" />
+			<zipfileset src="dist/lib/gson-1.7.1.jar" excludes="META-INF/*" />
+
+			<manifest>
+				<attribute name="Main-Class" value="net.smartsocket.SmartSocketServer"/>
+			</manifest>
+            
+		</jar>
+	</target>
+
+
 </project>

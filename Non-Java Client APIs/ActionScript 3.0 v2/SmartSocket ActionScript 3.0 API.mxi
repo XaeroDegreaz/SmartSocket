@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<macromedia-extension
+name="SmartSocket AS3 API"
+version="2.0"
+type="component"
+requires-restart="true">
+
+	<author name="Jerome Doby - SmartSocket.net" />
+	
+	<products>
+		<product name="Flash" version="10" primary="true" />
+	</products>
+	
+	<description>
+		<![CDATA[<blockquote>On the web: <a href="http://www.smartsocket.net">www.smartsocket.net</a><br/>On Github: <a href="https://github.com/XaeroDegreaz/SmartSocket">https://github.com/XaeroDegreaz/SmartSocket</a><br/><br/><font color="yellow">ADD " $(LocalData)/SmartSocket/ " TO YOUR PROJECT CLASSPATH!</font><br/><br/>SmartSocket is an extensible open source, Java and PHP socket server engine. Its aim is to make creating multi-user applications as quick and painless as possible. With SmartSocket, you don't have to worry about keeping track of users, writing server code, managing threads, etc. All you have to do is use the simple communication protocol to send method calls back and forth between the server and the client!<br/>]]>
+	</description>
+ 
+	<ui-access>
+		<![CDATA[If you plan on using SmartLobby as the base for a lobby system, you can use the customizable, pre-built SmartComponents to help you get on your way. These components are already pre-coded to handle all of the basics you could want from any chat / game lobby. They are fully extensible -- they can be sub-classed easily, and default methods overridden and tweaked for your own personal taste.<br/><br/>You can find the SmartComponents in the SmartSocket API + SmartComponents folder in your standard components browser.<br/><br/>An example SmartLobby setup can be found in [USER]\AppData\Local\Adobe\[FLASH]\en_US\Configuration\Samples\SmartSocket API + SmartComponents</blockquote>]]> 
+	</ui-access>
+	
+	<license-agreement>
+		<![CDATA[]]>
+	</license-agreement> 
+ 
+	<files>
+		<!-- Core install of API and SmartComponents -->
+		<file source="SmartSocket ActionScript 3.0 API.fla" destination="$flash/Components/SmartSocket API + SmartComponents" shared="false"/>		
+		<file source="src/net" destination="$flash/SmartSocket" shared="false"/>
+		<file source="src/com" destination="$flash/SmartSocket" shared="false"/>
+		
+		<!--
+		Store the class files here, too so that they can be found by Flash Builder, or any other IDE that can set a classpath to the Flash User Interface dir.
+		Sadly, this doesn't effect the way Flash sees these classes, and they must still add them to their project class path (using the imports from above, hopefully)
+		-->
+		<file source="src/net" destination="$RootFolder/Common/Configuration/Component Source/ActionScript 3.0/User Interface" shared="false"/>
+		<file source="src/com" destination="$RootFolder/Common/Configuration/Component Source/ActionScript 3.0/User Interface" shared="false"/>
+		
+		<!-- Some Sample Content -->
+		<file source="SmartSocket ActionScript 3.0 API.fla" destination="$flash/Samples/SmartSocket API + SmartComponents" shared="false"/>
+		<file source="src" destination="$flash/Samples/SmartSocket API + SmartComponents/" shared="false"/>
+	</files>  
+ 
+</macromedia-extension>

@@ -57,6 +57,8 @@ public class Config {
 	 * String <b>update-url</b> - Location should point to GitHup repo for SmartSocket.
 	 */
 	public static JsonObject autoUpdate;
+	
+	public static boolean useGUI = true;
 	//#####################################
 
 	/**

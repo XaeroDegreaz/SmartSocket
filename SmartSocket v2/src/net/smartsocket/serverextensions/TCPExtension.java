@@ -82,15 +82,12 @@ public abstract class TCPExtension extends AbstractExtension {
 
 		//# Register this extension with the console
 		ConsoleForm.start( this );
-		open();
 	}
 
 	/**
 	 * This method is called directly from the ConsoleForm upon starting up
 	 */
-	private synchronized void open() {
-		while ( !isConsoleFormRegistered ) {
-		}
+	public synchronized void open() {
 		Config.load();
 		//# Open a ServerSocket with a backlog of 500, which should be plenty...
 		try {
@@ -98,12 +95,16 @@ public abstract class TCPExtension extends AbstractExtension {
 			setRunning( true );
 			Logger.log( "[" + getExtensionName() + "] Extension running on port " + getPort(), Logger.CRITICAL );
 
-			//# Add custom tab for this extension...
-			ConsoleForm.tabbedPane.add( getExtensionName(), new ExtensionConsole( getExtensionName() ) );
-			//# Set this extension tab as the active extension tab
-			ConsoleForm.tabbedPane.setSelectedIndex( ConsoleForm.tabbedPane.indexOfTab( getExtensionName() ) );
+			if ( Config.useGUI == true ) {
+				//# Add custom tab for this extension...
+				ConsoleForm.tabbedPane.add( getExtensionName(), new ExtensionConsole( getExtensionName() ) );
+				//# Set this extension tab as the active extension tab
+				ConsoleForm.tabbedPane.setSelectedIndex( ConsoleForm.tabbedPane.indexOfTab( getExtensionName() ) );
+			}
+			
 			accept();
 		} catch (Exception e) {
+			e.printStackTrace();
 			Logger.log( e.getMessage() );
 		}
 	}

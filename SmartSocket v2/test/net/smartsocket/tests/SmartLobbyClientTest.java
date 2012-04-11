@@ -2,7 +2,8 @@ package net.smartsocket.tests;
 
 import com.google.gson.JsonObject;
 import net.smartsocket.client.SmartLobbyClient;
-import net.smartsocket.protocols.json.RemoteCall;
+import net.smartsocket.protocols.binary.RemoteCall;
+
 
 /**
  * A simple test client not really included in the main packages.
@@ -33,5 +34,10 @@ public class SmartLobbyClientTest extends SmartLobbyClient {
 	public void onLogin(JsonObject json) {
         System.out.println(json);
     }
+
+	@Override
+	protected void onSendFail(RemoteCall call, Exception e ) {
+		
+	}
     
 }

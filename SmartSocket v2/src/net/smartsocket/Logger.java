@@ -49,7 +49,15 @@ public class Logger {
 		//# Take apart all of the information from the class that is calling this log.
 		String fullyQualifiedName = new Throwable().fillInStackTrace().getStackTrace()[2].getClassName();
 		String callingClass = fullyQualifiedName.substring( fullyQualifiedName.lastIndexOf( "." ) + 1, fullyQualifiedName.length() );
-
+		
+		//# Let's take into account that not everyone will want the GUI
+		if( Config.useGUI == false ) {
+			System.out.println("["+callingClass+"]\t"+message);
+			return;
+		}
+		
+		System.out.println("["+callingClass+"]\t"+message);
+		
 		//# This is the actual HTML string that will be input into our log.
 		String newLine = "<tr><td valign='top' align='left'>" + callingClass + ":&nbsp;&nbsp;&nbsp;</td><td>" + message + "</td></tr>";
 

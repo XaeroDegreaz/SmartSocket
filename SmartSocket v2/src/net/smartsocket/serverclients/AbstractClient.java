@@ -12,7 +12,10 @@ public class AbstractClient extends Thread {
      */
     protected Object uniqueId;
 
-    public void AbstractClient() {
+	/**
+	 * 
+	 */
+	public void AbstractClient() {
         
     }
 

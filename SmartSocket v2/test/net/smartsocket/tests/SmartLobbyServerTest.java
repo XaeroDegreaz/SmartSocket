@@ -1,6 +1,7 @@
 package net.smartsocket.tests;
 
 import com.google.gson.JsonObject;
+import net.smartsocket.Config;
 import net.smartsocket.Logger;
 import net.smartsocket.protocols.json.RemoteCall;
 import net.smartsocket.serverclients.TCPClient;
@@ -20,6 +21,7 @@ public class SmartLobbyServerTest extends SmartLobby {
 	 * @param args
 	 */
 	public static void main( String[] args ) {
+		Config.useGUI = false;
 		new SmartLobbyServerTest().start();
 	}
 
@@ -34,7 +36,7 @@ public class SmartLobbyServerTest extends SmartLobby {
 	protected void onSmartLobbyReady() {
 		setConfig();
 		//# Don't want all of the traffic messages.
-		Logger.setLogLevel( Logger.INFO );
+		Logger.setLogLevel( Logger.DEBUG );
 		
 		this.addEventListener( SmartLobbyEvent.onRoomAdd, "someTest", this);
 	}

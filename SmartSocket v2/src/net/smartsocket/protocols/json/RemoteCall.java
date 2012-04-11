@@ -14,6 +14,7 @@ import net.smartsocket.Logger;
  *client.send(call);<br/>
  *</code>
  * @author XaeroDegreaz
+ * @deprecated Use net.smartsocket.protocols.binary.RemoteCall, instead. It has the same base capabilities, plus file sending.
  */
 public class RemoteCall {
 

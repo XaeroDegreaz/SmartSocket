@@ -21,7 +21,6 @@ public class Room {
 	public static Room getDefaultRoom() {
 		return defaultRoom;
 	}
-
 	//# We mark this transient because we don't want users serialized when sending out room lists.
 	//# If a user wants the list of users in the room, they must explicitly call getUserList from their client.
 	/**
@@ -121,34 +120,34 @@ public class Room {
 			customData = room.get( "customData" ).getAsJsonObject();
 		} catch (Exception e) {
 		}
-		
+
 		try {
 			isAcceptingBroadcastMessages = room.get( "isAcceptingBroadcastMessages" ).getAsBoolean();
 		} catch (Exception e) {
 		}
-		
+
 		if ( (password != null) && !password.equals( "" ) ) {
 			this.isPrivate = true;
 			this.password = room.get( "password" ).getAsString();
 		}
-		
+
 		try {
-			if( ( defaultRoom == null ) && ( room.get( "default").getAsBoolean() == true ) ) {
+			if ( (defaultRoom == null) && (room.get( "default" ).getAsBoolean() == true) ) {
 				defaultRoom = this;
-				
+
 				//# Default rooms should not be password protected...
 				this.password = "";
 				this.isPrivate = false;
-			}else {
+			} else {
 				//# Default room already set
 			}
 		} catch (Exception e) {
-		}		
+		}
 
 		setOwner( user );
 		setRoomId();
 		//# Process room object, etc...
-		
+
 	}
 
 	//# Events
@@ -156,7 +155,11 @@ public class Room {
 	 * Triggered when a User is joining this room
 	 * @param user The User object of the joiner
 	 */
-	public void onUserJoin( User user ) {		
+	public void onUserJoin( User user ) {
+		if ( this == user.getRoom() ) {
+			return;
+		}
+
 		try {
 			user.getRoom().onUserLeave( user );
 		} catch (Exception e) {
@@ -182,7 +185,7 @@ public class Room {
 		call = new RemoteCall( "onRoomCountUpdate" );
 		call.put( "room", RemoteCall.serialize( this ) );
 		slInstance.sendToList( slInstance.userList, call, false );
-		
+
 		//# Event listeners
 		slInstance.dispatchEvent( SmartLobbyEvent.onRoomJoin, this );
 		slInstance.dispatchEvent( SmartLobbyEvent.onUserJoin, user );
@@ -205,19 +208,12 @@ public class Room {
 			//# TODO Send roomlist update to rooms that need to receive this event			
 			RemoteCall call = new RemoteCall( "onRoomDelete" );
 			call.put( "room", RemoteCall.serialize( this ) );
-			
+
 			slInstance.sendToList( slInstance.userList, call, false );
-			
+
 			//# Event listener
 			slInstance.dispatchEvent( SmartLobbyEvent.onRoomDelete, this );
 			return;
-		}
-
-		//# Check to see if we need to assign another room owner
-		if ( getOwner() == user ) {
-			owner = null;
-			User newOwner = userList.entrySet().iterator().next().getValue();
-			//# TODO Send message to room showing that ownership has changed            
 		}
 
 		//# Send a message to this user that they have joined a new room
@@ -234,16 +230,28 @@ public class Room {
 		call = new RemoteCall( "onRoomCountUpdate" );
 		call.put( "room", RemoteCall.serialize( this ) );
 		slInstance.sendToList( slInstance.userList, call, false );
-		
+
 		//# Event listeners
 		slInstance.dispatchEvent( SmartLobbyEvent.onRoomLeave, this );
 		slInstance.dispatchEvent( SmartLobbyEvent.onUserLeave, user );
 		slInstance.dispatchEvent( SmartLobbyEvent.onRoomCountUpdate, this );
-		
+
 		//# We wait until this very point to remove the player from the list.. This way, they can receive their
 		//# own departure event.
 		userList.remove( user.getUsername() );
 		user.setRoom( null );
+
+		//# Check to see if we need to assign another room owner
+		try {
+			if ( getOwner() == user ) {
+				owner = userList.entrySet().iterator().next().getValue();
+				//# TODO Send message to room showing that ownership has changed            
+			}
+		} catch (Exception e) {
+			//# Something went wrong if an exception gets thrown here!
+			//# Likely lots of users left the room at the same time, but the counter should accomodate for this.
+			//# Just protecting the server from a case like that where next().getValue() would throw null pointer
+		}
 	}
 
 	/**
@@ -266,7 +274,7 @@ public class Room {
 		call.put( "isAcceptingNewJoiners", isAcceptingNewJoiners );
 
 		slInstance.sendToList( slInstance.userList, call, false );
-		
+
 		//# Event listeners.
 		slInstance.dispatchEvent( SmartLobbyEvent.onRoomLockToggled, call );
 	}
@@ -279,17 +287,17 @@ public class Room {
 	public void kickUser( User user, JsonObject json ) {
 		if ( getOwner() != user ) {
 			//# Illegal kick command.. maybe log this somewhere.
-			Logger.log("Invalid kick attempt.");
+			Logger.log( "Invalid kick attempt." );
 			return;
 		}
 		//# Grab the user
 		User target = slInstance.getUserByUsername( json.get( "username" ).getAsString() );
-		
+
 		//# Make sure they aren't kicking themselves -_-
-		if( user == target ) {
+		if ( user == target ) {
 			//return;
 		}
-		
+
 		//# Verify that the target is a member of THIS room
 		if ( userList.containsValue( target ) ) {
 			//# Add to kick list to prevent re-join
@@ -298,12 +306,12 @@ public class Room {
 			//# Send the notification to all users in the room, including the target
 			RemoteCall call = new RemoteCall( "onUserKicked" );
 			call.put( "user", RemoteCall.serialize( target ) );
-			call.put( "reason", json.get( "reason").getAsString() );
-			slInstance.sendToList( userList, call, true );			
-			
+			call.put( "reason", json.get( "reason" ).getAsString() );
+			slInstance.sendToList( userList, call, true );
+
 			// Event listeners fire first so listening methods have access to room object while user still in here
 			slInstance.dispatchEvent( SmartLobbyEvent.onUserKicked, call );
-			
+
 			//# Send them packing to the default room/lobby
 			Room.getDefaultRoom().onUserJoin( target );
 		}
@@ -352,7 +360,7 @@ public class Room {
 		call.put( "userList", RemoteCall.serialize( tmp ) );
 		call.put( "roomName", this.name );
 		user.getTcpClient().send( call );
-		
+
 		//# Event listeners. No idea why someone would want a listener for this.. but here goes..
 		slInstance.dispatchEvent( SmartLobbyEvent.onUserList, call );
 	}

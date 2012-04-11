@@ -1,6 +1,6 @@
 package net.smartsocket.client;
 
-import net.smartsocket.protocols.json.RemoteCall;
+import net.smartsocket.protocols.binary.RemoteCall;
 
 
 /**

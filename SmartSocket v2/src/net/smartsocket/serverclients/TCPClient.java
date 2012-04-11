@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import net.smartsocket.*;
 import net.smartsocket.serverextensions.TCPExtension;
 import net.smartsocket.forms.StatisticsTracker;
@@ -32,9 +33,13 @@ public class TCPClient extends AbstractClient {
 	private static long inboundBytes = 0;
 	private static long outboundBytes = 0;
 	//# These are the private vars that never need to be accessed period outside this class.
-	private BufferedReader _in = null;
-	private PrintWriter _out = null;
+	private DataInputStream in;
+	private DataOutputStream out;
 	private Socket _client = null;
+	/**
+	 * The IP address of this TCPClient
+	 */
+	private String _ipAddress;
 	private TCPExtension _extension = null;
 
 	/**
@@ -45,6 +50,11 @@ public class TCPClient extends AbstractClient {
 	public TCPClient( Socket client, TCPExtension extension ) {
 		this._client = client;
 		this._extension = extension;
+
+		String cleanIp = client.getRemoteSocketAddress().toString().split( ":", 2 )[0].replace( "/", "" );
+
+		this._ipAddress = cleanIp;
+		Logger.log( "Client connected from: " + _ipAddress );
 	}
 
 	@Override
@@ -61,8 +71,12 @@ public class TCPClient extends AbstractClient {
 			} catch (Exception ex) {
 				//# This should never happen since each thread name is unique.......
 			}
-			//# Update the interface to show new connection
-			StatisticsTracker.updateClientsConnectedLabel();
+
+			if ( Config.useGUI ) {
+				//# Update the interface to show new connection
+				StatisticsTracker.updateClientsConnectedLabel();
+			}
+
 			//# Send an onconnect message to the extension
 			_extension.onConnect( this );
 			//# Method used to setup initial streams, ie string, json, xml, binary streams, etc
@@ -79,9 +93,9 @@ public class TCPClient extends AbstractClient {
 		try {
 			if ( Config.crossdomainPolicyFile.get( "enabled" ).getAsBoolean() ) {
 				Logger.log( "Sending crossdomain policy file." );
-				_out.write( Config.crossdomainPolicyFile.get( "content" ).getAsString() );
-				_out.write( nullByte );
-				_out.flush();
+				//out.writeUTF( Config.crossdomainPolicyFile.get( "content" ).getAsString() );
+				out.write( nullByte );
+				out.flush();
 			} else {
 				Logger.log( "Not sending cross-domain-policy: " + Config.crossdomainPolicyFile );
 			}
@@ -96,8 +110,8 @@ public class TCPClient extends AbstractClient {
 	private void setupSession() {
 		//# Initialize all of the input and output streams here...
 		try {
-			_in = new BufferedReader( new InputStreamReader( _client.getInputStream() ) );
-			_out = new PrintWriter( new OutputStreamWriter( _client.getOutputStream() ) );
+			in = new DataInputStream( _client.getInputStream() );
+			out = new DataOutputStream( _client.getOutputStream() );
 		} catch (Exception e) {
 			//# Really should never get here, but just in case...
 			Logger.log( e );
@@ -118,13 +132,15 @@ public class TCPClient extends AbstractClient {
 			clients.remove( this.uniqueId );
 			_extension.removeClient( this );
 
-			//# Update the interface to show new connection
-			StatisticsTracker.updateClientsConnectedLabel();
+			if ( Config.useGUI ) {
+				//# Update the interface to show new connection
+				StatisticsTracker.updateClientsConnectedLabel();
+			}
 
 			//# Tidy up our resources
 			try {
-				_out.close();
-				_in.close();
+				out.close();
+				in.close();
 				_client.close();
 			} catch (Exception e) {
 				//# Should never get here, but just in case
@@ -138,31 +154,54 @@ public class TCPClient extends AbstractClient {
 	 */
 	private void read() {
 		String input = null;
-
+		byte[] bytes = null;
+		int red;
 		try {
-			while ( !(input = _in.readLine()).equals( null ) ) {
-				//# TODO - Add some different processing method calls here (xml, raw). Add some try/catch blocks to go down the line.
-				process( input );
+			while ( (red = in.read()) != -1 ) {
+				Logger.log( "Client input stream open." );
+
+				long fileLength = getFileLength();
+				byte[] fileBytes = getFileBytes( fileLength );
+				String jsonHeader = getJsonHeader();
+
+				Logger.log( "Server message: " + fileLength + " / " + jsonHeader );
+
+				process( jsonHeader, fileBytes );
 			}
+			Logger.log( "Client input stream closed." + red );
 		} catch (Exception e) {
-			Logger.log( "Client " + Thread.currentThread().getId() + " disconnected." );
+			Logger.log( "Client " + Thread.currentThread().getId() + " disconnected." + e.getMessage() );
+			e.printStackTrace();
 		}
 
 	}
 
+	public long getFileLength() throws IOException {
+		return in.readLong();
+	}
+
+	private byte[] getFileBytes( long fileLength ) throws IOException {
+		byte[] fileBytes = new byte[(int) fileLength];
+
+		for ( int i = 0; i < fileLength; i++ ) {
+			fileBytes[i] = in.readByte();
+		}
+
+		return fileBytes;
+	}
+
+	public String getJsonHeader() throws IOException {
+		return in.readUTF().trim();
+	}
+
 	/**
-	 * Process the lines of text being sent from the client to the server.
+	 * The method processes incoming data from the client, and routes them to the proper methods on the server extension.
 	 * @param line
 	 */
-	private void process( String line ) {
+	private void process( String line, byte[] fileBytes ) {
 		//# Add the size of this line of text to our inboundByte variable for gui usage
-		setInboundBytes( getInboundBytes() + line.getBytes().length );
+		setInboundBytes( getInboundBytes() + line.getBytes().length + fileBytes.length );
 		Logger.log( "Client " + Thread.currentThread().getId() + " says: " + line );
-
-		//# Get ready to create dynamic method call to extension
-		Class[] classes = new Class[2];
-		classes[0] = TCPClient.class;
-		classes[1] = JsonObject.class;
 
 		//# Reflection
 		Method m = null;
@@ -176,15 +215,40 @@ public class TCPClient extends AbstractClient {
 			params = (JsonObject) new JsonParser().parse( line );
 			methodName = params.get( "method" ).getAsString();
 
-			//# First let's send this message to the extensions onDataSpecial to see if
-			//# the extension wants to process this message in its own special way.
-			if ( _extension.onDataSpecial( this, methodName, params ) == false ) {
+			if ( fileBytes.length == 0 ) {
+				//# Get ready to create dynamic method call to extension
+				Class[] classes = new Class[2];
+				classes[0] = TCPClient.class;
+				classes[1] = JsonObject.class;
+				
+				//# First let's send this message to the extensions onDataSpecial to see if
+				//# the extension wants to process this message in its own special way.
+				if ( _extension.onDataSpecial( this, methodName, params ) == false ) {
 
-				//# Try to call the method on the desired extension class
-				//# This is only executed if onDataSpecial returns false on our extension.
-				Object[] o = { this, params };
-				m = _extension.getExtension().getMethod( methodName, classes );
-				m.invoke( _extension.getExtensionInstance(), o );
+					//# Try to call the method on the desired extension class
+					//# This is only executed if onDataSpecial returns false on our extension.
+					Object[] o = { this, params };
+					m = _extension.getExtension().getMethod( methodName, classes );
+					m.invoke( _extension.getExtensionInstance(), o );
+				}
+			} else {
+				//# We are here becuase we are also trying to pass a file to a method on our extension for writing.
+				//# Get ready to create dynamic method call to extension
+				Class[] classes = new Class[3];
+				classes[0] = TCPClient.class;
+				classes[1] = JsonObject.class;
+				classes[2] = byte[].class;
+				
+				//# First let's send this message to the extensions onDataSpecial to see if
+				//# the extension wants to process this message in its own special way.
+				if ( _extension.onDataSpecial( this, methodName, params ) == false ) {
+
+					//# Try to call the method on the desired extension class
+					//# This is only executed if onDataSpecial returns false on our extension.
+					Object[] o = { this, params, fileBytes };
+					m = _extension.getExtension().getMethod( methodName, classes );
+					m.invoke( _extension.getExtensionInstance(), o );
+				}
 			}
 
 		} catch (JsonParseException e) {
@@ -205,12 +269,52 @@ public class TCPClient extends AbstractClient {
 	 * The RemoteCall message to send to this client
 	 * @param message
 	 * @see RemoteCall
+	 * @deprecated Use send(net.smartsocket.protocols.binary.RemoteCall call)
 	 */
-	public void send( RemoteCall message ) {
+	public void send( net.smartsocket.protocols.json.RemoteCall message ) {
 		//# Add the size of this line of text to our inboundByte variable for gui usage
 		setOutboundBytes( getOutboundBytes() + message.properties.toString().getBytes().length );
-		_out.print( message.properties.toString() + _extension.getNewlineCharacter() );
-		_out.flush();
+		try {
+			out.write( (message.properties.toString() + _extension.getNewlineCharacter()).getBytes() );
+			out.flush();
+		} catch (IOException ex) {
+			java.util.logging.Logger.getLogger( TCPClient.class.getName() ).log( Level.SEVERE, null, ex );
+		}
+	}
+
+	/**
+	 * The RemoteCall message to send to this client
+	 * @param message
+	 * @see RemoteCall
+	 */
+	public void send( net.smartsocket.protocols.binary.RemoteCall call ) {
+		System.out.println( "OUTGOING: " + call.properties.toString() );
+		try {
+			byte[] fileBytes = new byte[0];
+
+			if ( call.file != null ) {
+				long fileLength = call.file.length();
+				fileBytes = new byte[(int) fileLength];
+
+				call.properties.addProperty( "fileSize", fileLength );
+
+				FileInputStream fileInputStream = new FileInputStream( call.file );
+				fileInputStream.read( fileBytes );
+			}
+
+			out.write( 0 );
+			out.writeLong( fileBytes.length );			
+			
+			if(fileBytes.length != 0) {
+				out.write( fileBytes );
+			}
+			
+			out.writeUTF( call.properties.toString() );
+			
+			out.flush();
+		} catch (Exception e) {
+			System.err.println( "Write error (" + e + "): " + call );
+		}
 	}
 
 	/**
@@ -245,7 +349,9 @@ public class TCPClient extends AbstractClient {
 	 * @param aInboundBytes the inboundBytes to set
 	 */
 	public static void setInboundBytes( long aInboundBytes ) {
-		inboundBytes = aInboundBytes;
+		if ( Config.useGUI ) {
+			inboundBytes = aInboundBytes;
+		}
 	}
 
 	/**
@@ -261,7 +367,9 @@ public class TCPClient extends AbstractClient {
 	 * @param aOutboundBytes the outboundBytes to set
 	 */
 	public static void setOutboundBytes( long aOutboundBytes ) {
-		outboundBytes = aOutboundBytes;
+		if ( Config.useGUI ) {
+			outboundBytes = aOutboundBytes;
+		}
 	}
 
 	/**
@@ -290,5 +398,21 @@ public class TCPClient extends AbstractClient {
 
 		//# Finally, set the new id.
 		this.uniqueId = uniqueId;
+	}
+
+	/**
+	 * The IP address of this TCPClient
+	 * @return the _ipAddress
+	 */
+	public String getIpAddress() {
+		return _ipAddress;
+	}
+
+	/**
+	 * The IP address of this TCPClient
+	 * @param ipAddress the _ipAddress to set
+	 */
+	public void setIpAddress( String ipAddress ) {
+		this._ipAddress = ipAddress;
 	}
 }

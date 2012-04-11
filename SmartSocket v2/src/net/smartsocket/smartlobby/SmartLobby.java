@@ -46,7 +46,7 @@ public abstract class SmartLobby extends TCPExtension {
 	 * 
 	 */
 	protected Gson gson = new Gson();
-	private Map<SmartLobbyEvent, Map<String, Object>> listeners = new EnumMap<SmartLobbyEvent, Map<String, Object>>(SmartLobbyEvent.class);
+	private Map<SmartLobbyEvent, Map<String, Object>> listeners = new EnumMap<SmartLobbyEvent, Map<String, Object>>( SmartLobbyEvent.class );
 	//private SmartLobby extension;
 
 	/**
@@ -60,20 +60,53 @@ public abstract class SmartLobby extends TCPExtension {
 		//this.extension = extension;
 	}
 
+	//# <editor-fold defaultstate="collapsed" desc="Overrides / Abstracts">
+	/**
+	 * Inherited from TCPExtension, SmartLobby doesn't use this for anything. Feel free to override it in your extension.
+	 * @param client 
+	 */
+	@Override
+	public void onConnect( TCPClient client ) {
+		//# No need to really do anything here. Feel free to override it in your extension...
+	}
+
+	/**
+	 * Inherited from TCPExtension, if you override this method in your extension, be sure to include the original code back, too!
+	 * @param client 
+	 */
+	@Override
+	public void onDisconnect( TCPClient client ) {
+		//# Remove them from their room, if they are in one
+		User user = getUserByTCPClient( client );
+		//# This is mostly a check for the crossdomain request;
+		//# we don't want to try to remove a non-existant user
+		if ( user != null ) {
+			try {
+				User u = userList.remove( user.getUsername() );
+				user.getRoom().onUserLeave( user );
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	@Override
 	public void onExtensionReady() {
-		//ConsoleForm.tabbedPane.add("SmartLobby", new ExtensionConsole("SmartLobby"));
-		ConsoleForm.tabbedPane.insertTab( "SmartLobby", null, new ExtensionConsole( "SmartLobby" ), null, 1 );
-		ConsoleForm.tabbedPane.insertTab( "Room", null, new ExtensionConsole( "Room" ), null, 2 );
-		ConsoleForm.tabbedPane.insertTab( "User", null, new ExtensionConsole( "User" ), null, 3 );
+		if ( Config.useGUI ) {
+			ConsoleForm.tabbedPane.insertTab( "SmartLobby", null, new ExtensionConsole( "SmartLobby" ), null, 1 );
+			ConsoleForm.tabbedPane.insertTab( "Room", null, new ExtensionConsole( "Room" ), null, 2 );
+			ConsoleForm.tabbedPane.insertTab( "User", null, new ExtensionConsole( "User" ), null, 3 );
+		}
 		onSmartLobbyReady();
 	}
 
 	/**
-	 * Must be implemented by extending classes.
+	 * Must be implemented by extending classes. Override this instead of overriding onExtensionReady.
 	 */
 	protected abstract void onSmartLobbyReady();
+	//# </editor-fold>
 
+	//# <editor-fold defaultstate="collapsed" desc="Configuration Methods">
 	/**
 	 * Specify file to act as the configuration file for SmartLobby
 	 * @param file
@@ -106,27 +139,19 @@ public abstract class SmartLobby extends TCPExtension {
 		Logger.log( "Custom JSON Object being used for the SmartLobby configuration!" );
 	}
 
-	@Override
-	public void onConnect( TCPClient client ) {
-		//# No need to really do anything here.
-	}
+	private void setDefaultRooms( JsonArray array ) {
+		//# Loop through the array and create some rooms
+		//# no username need be set; owner will be null wich will suffice
+		for ( int i = 0; i < array.size(); i++ ) {
+			JsonObject r = (JsonObject) array.get( i );
 
-	@Override
-	public void onDisconnect( TCPClient client ) {
-		//# Remove them from their room, if they are in one
-		User user = getUserByTCPClient( client );
-		//# This is mostly a check for the crossdomain request;
-		//# we don't want to try to remove a non-existant user
-		if ( user != null ) {
-			try {
-				User u = userList.remove( user.getUsername() );
-				user.getRoom().onUserLeave( user );
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			Room rm = new Room( r, this, new User( "Server" ) );
+			roomList.put( r.get( "name" ).getAsString(), rm );
 		}
 	}
+	//# </editor-fold>
 
+	//# <editor-fold defaultstate="collapsed" desc="onDataSpecial">
 	/**
 	 * We use the special onDataSpecial in our SmartLobby extension to route Room
 	 * and User events to their designated methods instead of handling them here in
@@ -144,7 +169,7 @@ public abstract class SmartLobby extends TCPExtension {
 		if ( user == null ) {
 			return false;
 		}
-		
+
 		Method m = null;
 
 		Class[] c = new Class[2];
@@ -175,18 +200,9 @@ public abstract class SmartLobby extends TCPExtension {
 		}
 		return false;
 	}
+	//# </editor-fold>
 
-	private void setDefaultRooms( JsonArray array ) {
-		//# Loop through the array and create some rooms
-		//# no username need be set; owner will be null wich will suffice
-		for ( int i = 0; i < array.size(); i++ ) {
-			JsonObject r = (JsonObject) array.get( i );
-
-			Room rm = new Room( r, this, new User( "Server" ) );
-			roomList.put( r.get( "name" ).getAsString(), rm );
-		}
-	}
-
+	//# <editor-fold defaultstate="collapsed" desc="SmartLobby Methods">
 	/**
 	 * This is a very simple login mechanism that accepts a string name
 	 * and creates a User object, then places it in the Collection.
@@ -202,35 +218,6 @@ public abstract class SmartLobby extends TCPExtension {
 		if ( isUsernameUnique( client, json ) ) {
 			dispatchEvent( SmartLobbyEvent.onLogin, getUserByTCPClient( client ) );
 		}
-	}
-
-	/**
-	 * 
-	 * @param client
-	 * @param json
-	 * @return
-	 */
-	protected Boolean isUsernameUnique( TCPClient client, JsonObject json ) {
-		//# Perform some login logic here to see if the username is already in use.
-		try {
-			client.setUniqueId( json.get( "username" ).getAsString() );
-			userList.put( client.getUniqueId().toString(), new User( client, this ) );
-
-			RemoteCall call = new RemoteCall( "onLogin", json.get( "directTo" ).getAsString() );
-			call.put( "username", json.get( "username" ).getAsString() );
-			client.send( call );
-
-		} catch (Exception e) {
-			Logger.log( "SmartLobby username taken: " + e );
-
-			RemoteCall call = new RemoteCall( "onLoginError" );
-			call.put( "error", "Username taken." );
-			client.send( call );
-			dispatchEvent( SmartLobbyEvent.onLoginError, client);
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -250,7 +237,7 @@ public abstract class SmartLobby extends TCPExtension {
 		RemoteCall call = new RemoteCall( "onRoomList" );
 		call.put( "roomList", RemoteCall.serialize( roomList ) );
 		client.send( call );
-		
+
 		//# Event
 		dispatchEvent( SmartLobbyEvent.onRoomList, getUserByTCPClient( client ) );
 	}
@@ -268,9 +255,9 @@ public abstract class SmartLobby extends TCPExtension {
 			RemoteCall call = new RemoteCall( "onCreateRoomError" );
 			call.put( "message", "A room already exists with that name." );
 			client.send( call );
-			
+
 			//# Event
-			dispatchEvent( SmartLobbyEvent.onCreateRoomError, user);
+			dispatchEvent( SmartLobbyEvent.onCreateRoomError, user );
 			return;
 		}
 
@@ -279,9 +266,9 @@ public abstract class SmartLobby extends TCPExtension {
 			RemoteCall call = new RemoteCall( "onCreateRoomError" );
 			call.put( "message", "You cannot create more than one room." );
 			client.send( call );
-			
+
 			//# Event
-			dispatchEvent( SmartLobbyEvent.onCreateRoomError, user);
+			dispatchEvent( SmartLobbyEvent.onCreateRoomError, user );
 			return;
 		}
 
@@ -301,7 +288,7 @@ public abstract class SmartLobby extends TCPExtension {
 
 		//# Tell the user that they have joined a room
 		room.onUserJoin( getUserByTCPClient( client ) );
-		
+
 		//# Event
 		dispatchEvent( SmartLobbyEvent.onRoomAdd, room );
 	}
@@ -323,7 +310,7 @@ public abstract class SmartLobby extends TCPExtension {
 				RemoteCall call = new RemoteCall( "onJoinRoomError" );
 				call.put( "message", "Room is locked-out." );
 				client.send( call );
-				
+
 				//# Event
 				dispatchEvent( SmartLobbyEvent.onRoomJoinError, getUserByTCPClient( client ) );
 				return;
@@ -334,7 +321,7 @@ public abstract class SmartLobby extends TCPExtension {
 				RemoteCall call = new RemoteCall( "onJoinRoomError" );
 				call.put( "message", "Room is full." );
 				client.send( call );
-				
+
 				//# Event
 				dispatchEvent( SmartLobbyEvent.onRoomJoinError, getUserByTCPClient( client ) );
 				return;
@@ -346,7 +333,7 @@ public abstract class SmartLobby extends TCPExtension {
 					RemoteCall call = new RemoteCall( "onJoinRoomError" );
 					call.put( "message", "Invalid password." );
 					client.send( call );
-					
+
 					//# Event
 					dispatchEvent( SmartLobbyEvent.onRoomJoinError, getUserByTCPClient( client ) );
 					return;
@@ -356,7 +343,7 @@ public abstract class SmartLobby extends TCPExtension {
 			RemoteCall call = new RemoteCall( "onJoinRoomError" );
 			call.put( "message", "Room does not exist." );
 			client.send( call );
-			
+
 			//# Event
 			dispatchEvent( SmartLobbyEvent.onRoomJoinError, getUserByTCPClient( client ) );
 			return;
@@ -378,9 +365,9 @@ public abstract class SmartLobby extends TCPExtension {
 		call.put( "message", json.get( "message" ).getAsString() );
 
 		sendToList( user.getRoom().userList, call, true );
-		
+
 		//# Event handler
-		dispatchEvent( SmartLobbyEvent.onMessageRoom, call);
+		dispatchEvent( SmartLobbyEvent.onMessageRoom, call );
 	}
 
 	/**
@@ -399,9 +386,9 @@ public abstract class SmartLobby extends TCPExtension {
 
 			client.send( call );
 			target.getTcpClient().send( call );
-			
+
 			//# Event listener
-			dispatchEvent( SmartLobbyEvent.onMessagePrivate, call);
+			dispatchEvent( SmartLobbyEvent.onMessagePrivate, call );
 		} else {
 		}
 	}
@@ -415,8 +402,9 @@ public abstract class SmartLobby extends TCPExtension {
 		User user = getUserByTCPClient( client );
 		user.getRoom().onUserLeave( user );
 	}
+	//# </editor-fold>
 
-	//# Helper methods..
+	//# <editor-fold defaultstate="collapsed" desc="Helper Methods">
 	/**
 	 * Get a Room object by its name key.
 	 * @param name
@@ -445,22 +433,36 @@ public abstract class SmartLobby extends TCPExtension {
 	}
 
 	/**
-	 * Sends a RemoteCall object to multiple targets <b>if</b> their room is set to accept broadcast messages.
-	 * @param list Map<String, User> list of User objects to send to
-	 * @param call The RemoteCall
-	 * @param isForceBroadcast Force this call to override the internal broadcast settings for the room, sending the message anyway.
+	 * Just a helper method to make sure the user id is unique, then send login stuff to user.
+	 * @param client
+	 * @param json
+	 * @return
 	 */
-	public void sendToList( Map<String, User> list, RemoteCall call, boolean isForceBroadcast ) {
-		for ( Map.Entry<String, User> entryUser : list.entrySet() ) {
-			User user = entryUser.getValue();
-			//# Only users in rooms accepting remote call packets will receive this event
-			//# unless specifically overridden (by a room event inside a locked out room, for instance)
-			if ( user.getRoom().isAcceptingBroadcastMessages || isForceBroadcast ) {
-				user.getTcpClient().send( call );
-			}
-		}
-	}
+	protected Boolean isUsernameUnique( TCPClient client, JsonObject json ) {
+		//# Perform some login logic here to see if the username is already in use.
+		try {
+			client.setUniqueId( json.get( "username" ).getAsString() );
+			userList.put( client.getUniqueId().toString(), new User( client, this ) );
 
+			RemoteCall call = new RemoteCall( "onLogin", json.get( "directTo" ).getAsString() );
+			call.put( "username", json.get( "username" ).getAsString() );
+			client.send( call );
+
+		} catch (Exception e) {
+			Logger.log( "SmartLobby username taken: " + e );
+
+			RemoteCall call = new RemoteCall( "onLoginError" );
+			call.put( "error", "Username taken." );
+			client.send( call );
+			dispatchEvent( SmartLobbyEvent.onLoginError, client );
+			return false;
+		}
+
+		return true;
+	}
+	//# </editor-fold>
+
+	//# <editor-fold defaultstate="collapsed" desc="Events">
 	/**
 	 * Add an event listener that will dispatch events to any objec that has a valit reference
 	 * to this SmartLobby object. These are only necessary to use if you really need some extra handling of the already
@@ -497,13 +499,13 @@ public abstract class SmartLobby extends TCPExtension {
 		Map<String, Object> listener = listeners.get( event );
 		//# TBD during loop
 		Method method = null;
-		
-		if(listener == null ) {
+
+		if ( listener == null ) {
 			return;
 		}
-		
+
 		for ( Map.Entry<String, Object> item : listener.entrySet() ) {
-			
+
 			Object targetInstance = item.getValue();
 			Class targetClass = targetInstance.getClass();
 			String targetMethod = item.getKey();
@@ -518,8 +520,26 @@ public abstract class SmartLobby extends TCPExtension {
 				method.invoke( targetInstance, paramData );
 			} catch (Exception e) {
 			}
-			
+
 		}
-		
+
+	}
+	//# </editor-fold>
+
+	/**
+	 * Sends a RemoteCall object to multiple targets <b>if</b> their room is set to accept broadcast messages.
+	 * @param list Map<String, User> list of User objects to send to
+	 * @param call The RemoteCall
+	 * @param isForceBroadcast Force this call to override the internal broadcast settings for the room, sending the message anyway.
+	 */
+	public void sendToList( Map<String, User> list, RemoteCall call, boolean isForceBroadcast ) {
+		for ( Map.Entry<String, User> entryUser : list.entrySet() ) {
+			User user = entryUser.getValue();
+			//# Only users in rooms accepting remote call packets will receive this event
+			//# unless specifically overridden (by a room event inside a locked out room, for instance)
+			if ( user.getRoom().isAcceptingBroadcastMessages || isForceBroadcast ) {
+				user.getTcpClient().send( call );
+			}
+		}
 	}
 }
