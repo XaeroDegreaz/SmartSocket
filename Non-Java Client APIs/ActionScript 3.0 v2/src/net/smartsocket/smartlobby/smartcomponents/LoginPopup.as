@@ -58,23 +58,23 @@ package net.smartsocket.smartlobby.smartcomponents {
 			_smartLobbyInstance.addEventListener(SmartLobbyEvent.onLoginError, onLoginError);
 			
 			//# Component events
-			btnLogin.addEventListener(MouseEvent.CLICK, onBtnLoginClick);
+			this["btnLogin"].addEventListener(MouseEvent.CLICK, onBtnLoginClick);
 		}
 		
 		private function onConnect(e:Event):void {
-			txtStatus.text = "The server is online; please login.";
+			this["txtStatus"].text = "The server is online; please login.";
 		}
 		
 		private function onError(e:IOErrorEvent):void {
-			txtStatus.text = "Connection to the server could not be established.";
+			this["txtStatus"].text = "Connection to the server could not be established.";
 		}
 		
 		private function onBtnLoginClick(e:MouseEvent):void {
-			if(txtUsername.text == "") {
+			if(this["txtUsername"].text == "") {
 				return;
 			}
 			
-			_smartLobbyInstance.login(txtUsername.text, txtPassword.text);
+			_smartLobbyInstance.login(this["txtUsername"].text, this["txtPassword"].text);
 		}
 		
 		private function onLogin(e:SmartLobbyEvent):void {
@@ -89,10 +89,7 @@ package net.smartsocket.smartlobby.smartcomponents {
 		
 		
 		private function onLoginError(e:SmartLobbyEvent):void {
-			txtStatus.text = e.data.error;
-		}
-		
-		
-		
+			this["txtStatus"].text = e.data.error;
+		}		
 	}
 }

@@ -97,7 +97,7 @@ package net.smartsocket.smartlobby.events {
 		 */		
 		public static const onUserLeave:String = "onUserLeave";
 		/**
-		 * This is dispatched when a user list is retrieved from the server. SmartLobbyEvent.data is a Vector.<User>.
+		 * This is dispatched when a user list is retrieved from the server. SmartLobbyEvent.data is a Vector.User.
 		 */		
 		public static const onUserList:String = "onUserList";		
 		/**

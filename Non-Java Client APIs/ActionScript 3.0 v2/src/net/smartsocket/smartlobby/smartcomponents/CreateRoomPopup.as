@@ -57,8 +57,8 @@ package net.smartsocket.smartlobby.smartcomponents {
 			_smartLobbyInstance.addEventListener(SmartLobbyEvent.onCreateRoom, onCreateRoom);
 			
 			//# Component events
-			btnCreate.addEventListener(MouseEvent.CLICK, onBtnCreateClick);
-			btnCancel.addEventListener(MouseEvent.CLICK, onBtnCancelClick);
+			this["btnCreate"].addEventListener(MouseEvent.CLICK, onBtnCreateClick);
+			this["btnCancel"].addEventListener(MouseEvent.CLICK, onBtnCancelClick);
 		}
 		
 		private function onCreateRoomError(e:SmartLobbyEvent):void {
@@ -78,7 +78,7 @@ package net.smartsocket.smartlobby.smartcomponents {
 		}
 		
 		private function onBtnCreateClick(e:MouseEvent):void {
-			_smartLobbyInstance.createRoom(txtName.text, txtPassword.text, NumericStepper(spMaxUsers).value);
+			_smartLobbyInstance.createRoom(this["txtName"].text, this["txtPassword"].text, NumericStepper(this["spMaxUsers"]).value);
 		}
 		
 		private function onBtnCancelClick(e:MouseEvent):void {
