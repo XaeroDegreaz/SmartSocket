@@ -5,11 +5,19 @@
  */
 package net.smartsocket.forms;
 
+import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.SystemTray;
 import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -140,6 +148,7 @@ public class ConsoleForm extends javax.swing.JFrame {
 
 			public void run() {
 				new ConsoleForm();
+
 				logText.setText( ""
 						+ "<html>"
 						+ "<head>"
@@ -166,15 +175,14 @@ public class ConsoleForm extends javax.swing.JFrame {
 
 				//# Begin having the StatisticsTracker perform timed operations that display stats in GUi
 				StatisticsTracker.start();
-				
+
 				new Thread( new Runnable() {
 
 					public void run() {
-						((TCPExtension)caller).open();
+						((TCPExtension) caller).open();
 					}
-					
-				}, "TCPClient Thread").start();
-				
+				}, "TCPClient Thread" ).start();
+
 			}
 		} );
 		//# Mark the setup as complete so as not to allow other extensions to call this start method and mess up the console output
@@ -193,7 +201,7 @@ public class ConsoleForm extends javax.swing.JFrame {
     public static JScrollPane scrollPaneCritical;
     public static JTabbedPane tabbedPane;
     // End of variables declaration//GEN-END:variables
-	private static JFrame instance = null;
+	public static JFrame instance = null;
 	private static boolean isSetup = false;
 	/**
 	 * 

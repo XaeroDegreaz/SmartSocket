@@ -1,8 +1,17 @@
 package net.smartsocket.serverextensions;
 
 import com.google.gson.JsonObject;
+import java.awt.AWTException;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.net.*;
 import java.util.*;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import net.smartsocket.Config;
 import net.smartsocket.Logger;
 import net.smartsocket.serverclients.TCPClient;
@@ -89,6 +98,40 @@ public abstract class TCPExtension extends AbstractExtension {
 	 */
 	public synchronized void open() {
 		Config.load();
+		ConsoleForm.instance.setTitle( "SmartSocket - " + this.extensionName );
+		
+		//# TitleBar / System Tray Icon
+		if(imageIcon == null) {
+			imageIcon = new ImageIcon( getContextClassLoader().getResource( "net/smartsocket/resources/logo.png") );
+		}
+		
+		if ( imageIcon != null ) {
+			ConsoleForm.instance.setIconImage( imageIcon.getImage() );
+			ConsoleForm.instance.addWindowStateListener( new WindowStateListener() {
+
+				public void windowStateChanged( WindowEvent e ) {
+					if ( e.getNewState() == ConsoleForm.ICONIFIED ) {
+						try {
+							final TrayIcon trayIcon = new TrayIcon( imageIcon.getImage() );
+							trayIcon.addMouseListener( new MouseAdapter() {
+
+								@Override
+								public void mouseClicked( MouseEvent e ) {
+									ConsoleForm.instance.setVisible( true );
+									SystemTray.getSystemTray().remove( trayIcon );
+									ConsoleForm.instance.setState( JFrame.NORMAL );
+								}
+							} );
+							SystemTray.getSystemTray().add( trayIcon );
+							ConsoleForm.instance.setVisible( false );
+						} catch (AWTException e1) {
+							e1.printStackTrace();
+						}
+					}
+				}
+			} );
+		}
+
 		//# Open a ServerSocket with a backlog of 500, which should be plenty...
 		try {
 			setSocket( new ServerSocket( getPort(), 500 ) );
@@ -101,7 +144,7 @@ public abstract class TCPExtension extends AbstractExtension {
 				//# Set this extension tab as the active extension tab
 				ConsoleForm.tabbedPane.setSelectedIndex( ConsoleForm.tabbedPane.indexOfTab( getExtensionName() ) );
 			}
-			
+
 			accept();
 		} catch (Exception e) {
 			e.printStackTrace();
