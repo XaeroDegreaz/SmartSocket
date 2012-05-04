@@ -19,6 +19,8 @@ or the terms of any one of the MPL, the GPL or the LGPL.
 package net.smartsocket.protocols.json{
 	import com.adobe.serialization.json.JSONDecoder;
 	
+	import flash.utils.ByteArray;
+	
 	/**
 	 * The RemoteCall class is realy the backbone of SmartSocket. It allows us to easily send serialized objects back
 	 * and forth between the client and server in a predictable protocol. This is a dynamic class, so you are able to add
@@ -34,7 +36,11 @@ package net.smartsocket.protocols.json{
 		/**
 		 * This represents the dataListener on SmartSocketClient to refer all contents of a response to this call. 
 		 */		
-		public var directTo:Object;
+		public var directTo:Object;		
+		/**
+		 * This is a ByteArray which may hold a file sent from the server on this call.
+		 */
+		public var fileBytes:ByteArray;
 		
 		/**
 		 * Construct a new RemoteCall 

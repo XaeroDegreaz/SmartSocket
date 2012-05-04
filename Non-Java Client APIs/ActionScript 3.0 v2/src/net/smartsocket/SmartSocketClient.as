@@ -96,6 +96,23 @@ package net.smartsocket {
 				incoming = this.readUTFBytes(this.bytesAvailable);
 			}
 			
+			//# Trash byte
+			this.readByte();
+			
+			//# File length bytes
+			var fileLength:int = this.readInt();
+			
+			//# Setup a ByteArray to hold the file data
+			var fileBytes:ByteArray = new ByteArray();
+			
+			//# Loop through the buffer, and write these bytes to the fileBytes array
+			for(var ii:int = 0; ii < fileLength; ii++) {
+				fileBytes.writeByte( this.readByte() );
+			}
+			
+			//# Read the rest of the bytes as UTF -- this is the RemoteCall
+			incoming = this.readUTF();
+			
 			trace("SmartSocketClient <= Received "+incoming.replace("\r\n",""));
 			
 			//# Sometimes two or more sends get jammed together when sending from the server when sent right next to eachother
@@ -111,6 +128,8 @@ package net.smartsocket {
 				
 				//# Construct a RemoteCall object from the string.
 				var remoteCall:RemoteCall = RemoteCall.constructFrom(data);
+				//# Add in the ByteArray that may contain a file.
+				remoteCall.fileBytes = fileBytes;
 				
 				if(remoteCall.directTo && remoteCall.directTo != "") {
 					//# Here we try to direct this call to a target object, if the directTo property is not blank
