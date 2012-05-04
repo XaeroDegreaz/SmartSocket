@@ -93,7 +93,7 @@ public class TCPClient extends AbstractClient {
 		try {
 			if ( Config.crossdomainPolicyFile.get( "enabled" ).getAsBoolean() ) {
 				Logger.log( "Sending crossdomain policy file." );
-				//out.writeUTF( Config.crossdomainPolicyFile.get( "content" ).getAsString() );
+				out.writeUTF( Config.crossdomainPolicyFile.get( "content" ).getAsString() );
 				out.write( nullByte );
 				out.flush();
 			} else {
@@ -176,8 +176,14 @@ public class TCPClient extends AbstractClient {
 
 	}
 
-	public long getFileLength() throws IOException {
-		return in.readLong();
+	public long getFileLength() {
+		
+		try {
+			return in.readLong();
+		} catch (Exception e) {
+		}
+		
+		return 0;
 	}
 
 	private byte[] getFileBytes( long fileLength ) throws IOException {
@@ -266,10 +272,12 @@ public class TCPClient extends AbstractClient {
 	}
 
 	/**
-	 * The RemoteCall message to send to this client
+	 * The RemoteCall message to send to this client. This method should no longer be used <b>unless</b>
+	 * your client is a Flash client using the ActionScript 3.0 SmartSocket Client API, or you need
+	 * text-only data transfers.
 	 * @param message
-	 * @see RemoteCall
-	 * @deprecated Use send(net.smartsocket.protocols.binary.RemoteCall call)
+	 * @see net.smartsocket.protocols.json.RemoteCall
+	 * @deprecated Use send(net.smartsocket.protocols.binary.RemoteCall call) for non-Flash clients.
 	 */
 	public void send( net.smartsocket.protocols.json.RemoteCall message ) {
 		//# Add the size of this line of text to our inboundByte variable for gui usage
@@ -283,9 +291,10 @@ public class TCPClient extends AbstractClient {
 	}
 
 	/**
-	 * The RemoteCall message to send to this client
+	 * The RemoteCall message to send to this client. This send method is capable of sending files through
+	 * the socket as well. This send method is not compatible with clients using the ActionScript 3.0 SmartSocket Client API
 	 * @param message
-	 * @see RemoteCall
+	 * @see net.smartsocket.protocols.binary.RemoteCall
 	 */
 	public void send( net.smartsocket.protocols.binary.RemoteCall call ) {
 		System.out.println( "OUTGOING: " + call.properties.toString() );
